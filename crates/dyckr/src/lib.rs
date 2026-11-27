@@ -152,3 +152,4 @@ pub mod cpp_class;
 pub mod cpp_source;
 pub mod cpp_failure;
 pub mod cpp_tokens;
+pub mod cpp_attributes;
