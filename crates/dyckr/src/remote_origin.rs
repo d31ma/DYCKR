@@ -1,0 +1,55 @@
+pub struct RemoteOrigin;
+
+impl RemoteOrigin {
+    pub const PREFIX: &'static str = "/.tachyon/origin/";
+    const MOST_NAME_LENGTH: usize = 32;
+    const RESERVED: [&'static str; 4] = [
+        Self::PREFIX,
+        crate::reconnect_policy::ReconnectPolicy::PREFIX,
+        crate::stream_event_name::StreamEventName::PREFIX,
+        crate::stream_query::StreamQuery::PREFIX,
+    ];
+
+    pub fn addressed(name: &str, path: &str) -> Result<String, String> {
+        Self::refuse_bad_name(Self::is_name(name), name)?;
+        Ok(Self::prefixed(name, path))
+    }
+
+    pub fn prefixed(name: &str, path: &str) -> String {
+        format!("{}{name}{path}", Self::PREFIX)
+    }
+
+    pub fn check_written(path: &str) -> Result<(), String> {
+        let reserved = Self::RESERVED.iter().any(|prefix| path.starts_with(prefix));
+        Self::refuse_reserved(reserved)
+    }
+
+    pub fn is_name(name: &str) -> bool {
+        let starts_with_letter = name.starts_with(|letter: char| letter.is_ascii_lowercase());
+        let short = name.len() <= Self::MOST_NAME_LENGTH;
+        let plain = name.bytes().all(Self::is_name_byte);
+        [starts_with_letter, short, plain] == [true, true, true]
+    }
+
+    const fn is_name_byte(byte: u8) -> bool {
+        byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-'
+    }
+
+    fn refuse_bad_name(good: bool, name: &str) -> Result<(), String> {
+        if good {
+            return Ok(());
+        }
+        Err(format!(
+            "The client origin \"{name}\" is not a name from tac.yon.origins: a name starts with a lowercase letter and has at most 32 lowercase letters, digits and dashes, such as \"realtime\""
+        ))
+    }
+
+    fn refuse_reserved(reserved: bool) -> Result<(), String> {
+        if !reserved {
+            return Ok(());
+        }
+        Err(String::from(
+            "A client path cannot start with /.tachyon/origin/, /.tachyon/reconnect/, /.tachyon/event/ or /.tachyon/query/: Tachyon writes those itself. Name a server with \"origin\" instead, such as @HTTPClient({\"path\": \"/chat\", \"origin\": \"realtime\"})",
+        ))
+    }
+}

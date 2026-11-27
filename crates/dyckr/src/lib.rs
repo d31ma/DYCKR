@@ -68,3 +68,7 @@ pub mod shape;
 pub mod model;
 pub mod type_text;
 pub mod plan;
+pub mod reconnect_policy;
+pub mod remote_origin;
+pub mod stream_query;
+pub mod stream_event_name;
