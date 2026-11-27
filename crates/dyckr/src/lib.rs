@@ -93,3 +93,4 @@ pub mod base64;
 pub mod typescript_program;
 pub mod publish;
 pub mod gateway_limits;
+pub mod role_folders;
