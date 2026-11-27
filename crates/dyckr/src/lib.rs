@@ -176,3 +176,5 @@ pub mod safety;
 pub mod yon_member;
 pub mod native_outgoing_hosts;
 pub mod peers_member;
+pub mod native_theme_color;
+pub mod media_member;
