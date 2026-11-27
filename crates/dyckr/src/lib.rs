@@ -3,3 +3,4 @@ pub mod external_command;
 pub mod sorted_json;
 pub mod unicode_name;
 pub mod portable_path;
+pub mod failure;

@@ -50,6 +50,7 @@ dependencies = [
  "command-group",
  "serde",
  "serde_json",
+ "tachyon-diagnostics",
  "tokio",
 ]
 
@@ -189,6 +190,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "tachyon-diagnostics"
+version = "0.0.0-phase4"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

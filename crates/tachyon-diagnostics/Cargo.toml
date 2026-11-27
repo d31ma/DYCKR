@@ -1,0 +1,16 @@
+[package]
+name = "tachyon-diagnostics"
+description = "Stable diagnostic types and error-code validation for Tachyon"
+version = "0.0.0-phase4"
+edition = "2024"
+rust-version = "1.97.1"
+authors = ["Tachyon Contributors"]
+license = "MIT"
+repository = "https://github.com/d31ma/DYCKR"
+publish = false
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0.151"
