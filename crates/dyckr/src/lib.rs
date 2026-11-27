@@ -258,3 +258,4 @@ pub mod kotlin_members;
 pub mod with_required_constructor;
 pub mod owner_table;
 pub mod module_id;
+pub mod behavior_scope;
