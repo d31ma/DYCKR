@@ -138,3 +138,4 @@ pub mod fsharp_shadow;
 pub mod fsharp_shadow_writer;
 pub mod yon_marker;
 pub mod go_marker_name;
+pub mod ruby_lexer;
