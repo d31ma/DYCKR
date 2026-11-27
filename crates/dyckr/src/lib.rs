@@ -178,3 +178,7 @@ pub mod native_outgoing_hosts;
 pub mod peers_member;
 pub mod native_theme_color;
 pub mod media_member;
+pub mod native_display;
+pub mod native_orientation;
+pub mod native_title_bar;
+pub mod native_title_bar_button_inset;
