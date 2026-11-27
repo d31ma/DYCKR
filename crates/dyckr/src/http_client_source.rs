@@ -1,3 +1,22 @@
+pub const TAC: &'static str = "tac";
+pub const BROWSER_SCRIPTS: [&'static str; 2] = ["js", "ts"];
+pub const CLASS: &'static str = "httpclient";
+pub const STREAM: &'static str = "streamrequest";
+pub const SOCKET: &'static str = "socketrequest";
+pub const CACHE_OPTION_REFUSAL: &'static str = "@HTTPClient no longer takes \"cache\": its IndexedDB fetch cache was removed (ADR 0087). Mark the class @CacheSettings and each read method @Cached, like Spring's @Cacheable. For reads that work offline, add a rule for the path to tac.cache in client/manifest.json";
+pub const OTHER_ROLES: [&'static str; 9] = [
+        "service",
+        "store",
+        "delegate",
+        "converter",
+        "setup",
+        "entity",
+        "client",
+        "controller",
+        "requestroute",
+    ];
+
+
 pub const ROLE_SUFFIXES: [&'static str; 4] = ["Client", "Service", "Store", "Delegate"];
 
 pub const REQUESTS: [(&'static str, &'static str, &'static str); 5] = [
