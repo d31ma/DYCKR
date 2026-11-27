@@ -61,3 +61,4 @@ pub mod topics;
 pub mod topic_table;
 pub mod routing;
 pub mod lexical_mask;
+pub mod cpp_raw_text;
