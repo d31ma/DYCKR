@@ -255,3 +255,17 @@ pub fn query_body(method: &Method, query: &Value) -> Result<String, String> {
         crate::csharp::quote(&crate::sorted_json::SortedJson::text(query))
     ))
 }
+
+
+pub fn written_body(method: &Method) -> Result<Option<String>, String> {
+    if let Some(policy) = method.metadata.get("gateway") {
+        return Ok(Some(crate::csharp::gateway_body(method, policy)));
+    }
+    if let Some(query) = method.metadata.get("query") {
+        return crate::csharp::query_body(method, query).map(Some);
+    }
+    if let Some(policy) = method.metadata.get("mapping") {
+        return crate::csharp::mapping_body(method, policy).map(Some);
+    }
+    Ok(None)
+}
