@@ -160,3 +160,4 @@ pub mod cpp_declaration;
 pub mod cpp_member_reader;
 pub mod cpp_file_reader;
 pub mod cpp_file;
+pub mod cpp_yon_models;
