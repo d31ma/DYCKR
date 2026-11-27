@@ -211,3 +211,4 @@ pub mod native_site;
 pub mod behavior_input;
 pub mod behavior_marker;
 pub mod gateway;
+pub mod hot_update;
