@@ -142,3 +142,13 @@ pub fn uses_invocation(method: &Method) -> bool {
         || method.metadata.contains_key("cacheEvict")
         || method.metadata.contains_key("cachePut")
 }
+
+
+pub fn policy_line(type_declaration: &Type) -> String {
+    let policies = crate::sorted_json::SortedJson::text(&Value::Object(type_declaration.policies.clone()));
+    format!(
+        "if (type == typeof({})) return BehaviorJSON.Parse({});\n",
+        type_declaration.name,
+        crate::csharp::quote(&policies)
+    )
+}
