@@ -167,3 +167,4 @@ pub mod go_source;
 pub mod style_path;
 pub mod vendor_provenance;
 pub mod style_source;
+pub mod config_failure;
