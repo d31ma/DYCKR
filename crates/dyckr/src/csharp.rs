@@ -7,3 +7,9 @@ pub fn configuration_line(type_declaration: &Type) -> String {
         type_declaration.name, type_declaration.name
     )
 }
+use serde_json::Value;
+
+pub fn quote(value: &str) -> String {
+    Value::String(value.to_owned()).to_string()
+}
+
