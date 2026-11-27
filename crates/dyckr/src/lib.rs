@@ -248,3 +248,4 @@ pub mod parameter_text;
 pub mod csharp_browser_members;
 pub mod rust_construction;
 pub mod rust_held_fields;
+pub mod rust_owner_table;
