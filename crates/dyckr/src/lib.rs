@@ -185,3 +185,4 @@ pub mod native_title_bar_button_inset;
 pub mod native_menu_shortcut;
 pub mod system_version;
 pub mod rust_dependency;
+pub mod native_menu_action;
