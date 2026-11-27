@@ -1,7 +1,6 @@
 pub const NAMES: [&str; 6] = [
         "Service", "Lifetime", "NeedsAll", "Delegate", "Store", "Client",
     ];
-use crate::behavior_marker::Marker;
 
 
 pub fn marker(extension: &str, line: &str, start: usize) -> Option<Marker> {
@@ -43,4 +42,17 @@ pub fn marker_text<'a>(extension: &str, line: &'a str) -> Option<&'a str> {
             "cs" => line.strip_prefix('[')?.strip_suffix(']'),
             _ => line.strip_prefix('@'),
         }
+    }
+use crate::behavior_input::Input;
+use crate::behavior_marker::Marker;
+
+
+    pub fn required_names(input: &Input<'_>, marker: &Marker, no_arguments: &dyn Fn(&str) -> String) -> Result<Vec<String>, crate::failure::Failure> {
+        if !marker.arguments.trim().is_empty() {
+            return Err(input.failure(
+                marker.span.start,
+                no_arguments("NeedsAll"),
+            ));
+        }
+        Ok(vec![String::from("*")])
     }
