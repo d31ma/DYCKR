@@ -192,3 +192,4 @@ pub mod xml_escape;
 pub mod browser_api_permissions;
 pub mod native_links;
 pub mod target_floor;
+pub mod minimum_system;
