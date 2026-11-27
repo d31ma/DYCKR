@@ -246,3 +246,4 @@ pub mod rust_task_member;
 pub mod companion_member;
 pub mod parameter_text;
 pub mod csharp_browser_members;
+pub mod rust_construction;
