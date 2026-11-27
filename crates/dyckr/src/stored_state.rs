@@ -12,3 +12,29 @@ impl StoredState {
     }
 
 }
+use crate::behavior_marker::Marker;
+
+impl StoredState {
+
+    pub fn mentioned(source: &str) -> bool {
+        crate::stored_state::StoredState::SPELLINGS
+            .iter()
+            .any(|spelling| source.contains(spelling))
+    }
+
+    pub fn area(marker: &Marker) -> String {
+        if marker.name == crate::stored_state::StoredState::LOCAL {
+            String::from("local")
+        } else {
+            String::from("session")
+        }
+    }
+
+    pub fn visible_name(language: &str, name: &str) -> String {
+        match language {
+            "cs" | "go" => crate::lower_first::lower_first(name),
+            "rs" | "rb" | "py" => crate::companion_names::camel_case(name),
+            _ => name.to_owned(),
+        }
+    }
+}
