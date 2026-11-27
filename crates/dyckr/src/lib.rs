@@ -106,3 +106,4 @@ pub mod behavior_literal;
 pub mod event_module;
 pub mod http_client_source;
 pub mod shadow_lines;
+pub mod lua_lexer;
