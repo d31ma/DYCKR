@@ -150,3 +150,5 @@ pub mod cpp_lexer;
 pub mod cpp_member;
 pub mod cpp_class;
 pub mod cpp_source;
+pub mod cpp_failure;
+pub mod cpp_tokens;
