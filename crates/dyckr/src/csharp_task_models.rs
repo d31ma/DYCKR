@@ -1,6 +1,7 @@
 use crate::behavior_module::{Method, Module};
 use crate::csharp_task_answer::CsharpTaskAnswer;
 use crate::csharp_task_result::CsharpTaskResult;
+use crate::prepared::Prepared;
 use crate::route_types::ModelTable;
 
 
@@ -52,4 +53,15 @@ pub fn require_exchange(method: &Method) -> Result<(), String> {
             return Err("C# annotated Task or ValueTask of a model, list or plain value currently requires a generated HTTPClient exchange; other DTO behaviors remain unsupported.".to_owned());
         }
         Ok(())
+    }
+
+
+pub fn lower_prepared(prepared: Prepared, models: &ModelTable, lower: &dyn Fn(&Module) -> Result<String, String>) -> Result<String, String> {
+        match prepared {
+            crate::prepared::Prepared::Erased(erased) => Ok(erased),
+            crate::prepared::Prepared::Annotated(mut module) => {
+                crate::csharp_task_models::describe(&mut module, models)?;
+                lower(&module)
+            }
+        }
     }
