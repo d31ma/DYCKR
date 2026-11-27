@@ -145,3 +145,8 @@ pub mod cpp_member_kind;
 pub mod cpp_type_text;
 pub mod cpp_attribute;
 pub mod cpp_token;
+pub mod cpp_parameter;
+pub mod cpp_lexer;
+pub mod cpp_member;
+pub mod cpp_class;
+pub mod cpp_source;
