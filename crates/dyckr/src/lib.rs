@@ -243,3 +243,6 @@ pub mod kotlin_member_syntax;
 pub mod csharp_model_type;
 pub mod rust_arguments;
 pub mod rust_task_member;
+pub mod companion_member;
+pub mod parameter_text;
+pub mod csharp_browser_members;
