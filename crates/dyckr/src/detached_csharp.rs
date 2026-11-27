@@ -203,3 +203,40 @@ impl crate::detached_csharp::DetachedCsharp {
         }
     }
 }
+
+impl crate::detached_csharp::DetachedCsharp {
+    pub fn of_with(module: &Module, lower: &dyn Fn(&Module) -> Result<String, String>, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> Result<Self, String> {
+        let lowered = lower(module)?;
+        Ok(Self {
+            lowered,
+            runtime: Self::runtime_with(module, runtime),
+            setups: Self::setups(module),
+            methods: Self::methods(module),
+            types: crate::detached_csharp::types(module),
+            test_context: Self::test_context(module),
+        })
+    }
+
+    pub fn page_socket_runtime_with(path: &std::path::Path, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> String {
+        let module_id = crate::module_id::module_id(path);
+        crate::detached_csharp::configured(&runtime(
+            &module_id,
+            crate::detached_csharp_consts::TAC,
+            crate::detached_csharp_consts::NO_REGISTRY,
+            crate::detached_csharp_consts::CONFIGURATIONS_CALL,
+            "",
+            "",
+        ))
+    }
+
+    pub fn runtime_with(module: &Module, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> String {
+        crate::detached_csharp::configured(&runtime(
+            &module.module_id,
+            &module.environment,
+            &crate::detached_csharp::registry(module),
+            crate::detached_csharp_consts::CONFIGURATIONS_CALL,
+            &Self::entities(module),
+            &crate::detached_csharp::policies(module),
+        ))
+    }
+}
