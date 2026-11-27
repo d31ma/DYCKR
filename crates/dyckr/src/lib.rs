@@ -98,3 +98,4 @@ pub mod class_file_name;
 pub mod declaration;
 pub mod annotation_target;
 pub mod native_companion;
+pub mod dotnet_model_languages;
