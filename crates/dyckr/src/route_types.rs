@@ -64,7 +64,7 @@ impl ModelTable {
         table
     }
 
-    fn join_bases(&mut self) {
+    pub fn join_bases(&mut self) {
         let names: Vec<String> = self.models.keys().cloned().collect();
         for name in names {
             if let Some(Model::Record(record)) = self.models.get(&name) {
