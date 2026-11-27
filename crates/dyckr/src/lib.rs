@@ -72,3 +72,4 @@ pub mod reconnect_policy;
 pub mod remote_origin;
 pub mod stream_query;
 pub mod stream_event_name;
+pub mod php_doc;
