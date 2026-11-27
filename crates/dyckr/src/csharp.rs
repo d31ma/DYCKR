@@ -40,3 +40,13 @@ fn add_partition(entity: &Value, mapping: &mut Value) {
         mapping["partition"] = partition.clone();
     }
 }
+use crate::behavior_module::Method;
+
+
+pub fn json_arguments(method: &Method) -> String {
+    let mut arguments = Vec::new();
+    for parameter in &method.parameters {
+        arguments.push(format!("BehaviorJSON.From({})", parameter.name));
+    }
+    arguments.join(", ")
+}
