@@ -120,3 +120,4 @@ pub mod fsharp_line_kind;
 pub mod fsharp_field_need;
 pub mod fsharp_type;
 pub mod fsharp_attribute_line;
+pub mod fsharp_parameters;
