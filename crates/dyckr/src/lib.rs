@@ -57,3 +57,4 @@ pub mod topic_access;
 pub mod realm;
 pub mod program_probe;
 pub mod probe_memory;
+pub mod topics;
