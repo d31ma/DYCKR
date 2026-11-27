@@ -1,4 +1,4 @@
-use crate::behavior_module::{Method, Parameter, Type};
+use crate::behavior_module::{Edit, Method, Module, Parameter, Type};
 
 
 pub fn configuration_line(type_declaration: &Type) -> String {
@@ -7,7 +7,7 @@ pub fn configuration_line(type_declaration: &Type) -> String {
         type_declaration.name, type_declaration.name
     )
 }
-use serde_json::Value;
+use serde_json::{Map, Value};
 
 pub fn quote(value: &str) -> String {
     Value::String(value.to_owned()).to_string()
@@ -357,4 +357,69 @@ pub fn method_body(
     Ok(format!(
         "\n{prefix}return this.behaviors.Paginate(() => {{ {body} }});\n"
     ))
+}
+
+
+pub fn constructor_edit(type_declaration: &Type, fields: &[String]) -> Result<Edit, String> {
+    let parameters = crate::csharp::constructor_parameters(type_declaration, fields)?;
+    let mut assignments = Vec::new();
+    for name in fields {
+        assignments.push(format!("this.{name} = {name};"));
+    }
+    let assignments = assignments.join(" ");
+    let declarations = crate::polyglot::declared_fields(type_declaration, |field| {
+        format!("\nreadonly {} {};", field.type_source, field.name)
+    });
+    Ok(Edit {
+        range: type_declaration.body.start..type_declaration.body.start,
+        replacement: format!(
+            "{declarations}\npublic {}({parameters}) {{ {assignments} }}\n",
+            type_declaration.name
+        ),
+    })
+}
+
+pub fn public_members(type_declaration: &Type) -> impl Iterator<Item = Edit> + '_ {
+    type_declaration
+        .methods
+        .iter()
+        .filter(|method| method.declared)
+        .map(|method| Edit {
+            range: method.signature.start..method.signature.start,
+            replacement: "public ".to_owned(),
+        })
+}
+
+pub fn lower_methods(
+    module: &Module,
+    type_declaration: &Type,
+    edits: &mut Vec<Edit>,
+    exchange_body: &dyn Fn(&Type, &Method, &str) -> Option<String>,
+) -> Result<Map<String, Value>, String> {
+    let mut methods = Map::new();
+    edits.extend(crate::csharp::public_members(type_declaration));
+    for method in &type_declaration.methods {
+        if method.metadata.is_empty() {
+            continue;
+        }
+        if let Some(replacement) = crate::csharp::written_body(method)? {
+            edits.push(Edit {
+                range: method.body.clone(),
+                replacement: crate::polyglot::block(method, &replacement),
+            });
+            continue;
+        }
+        let mut prefix = crate::csharp::validation_prefix(method)?;
+        if let Some(policy) = method.metadata.get("pageable") {
+            prefix.push_str(&crate::csharp::pageable_line(method, policy)?);
+        }
+        let body = &module.source[method.body.clone()];
+        let replacement = crate::csharp::method_body(type_declaration, method, &prefix, body, exchange_body)?;
+        edits.push(Edit {
+            range: method.body.clone(),
+            replacement: crate::polyglot::block(method, &replacement),
+        });
+        methods.insert(method.name.clone(), Value::Object(method.metadata.clone()));
+    }
+    Ok(methods)
 }
