@@ -75,6 +75,24 @@ pub struct ModelSchema;
 
 impl ModelSchema {
 
+    pub fn native_plain(path: &Path, source: &str, script_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>, polyglot_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<Option<String>, Failure> {
+        let extension = path
+            .extension()
+            .and_then(|value| value.to_str())
+            .unwrap_or("");
+        let project = Self::native_projector(extension, script_plain, polyglot_plain);
+        project(path, source)
+    }
+
+    pub fn native_projector(extension: &str, script_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>, polyglot_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>) -> fn(&Path, &str) -> Result<Option<String>, Failure> {
+        match extension {
+            "java" => crate::model_schema::java_plain,
+            "js" | "ts" => script_plain,
+            _ => polyglot_plain,
+        }
+    }
+
+
     pub fn require_realm(path: &Path, source: &str, schema: bool) -> Result<(), crate::failure::Failure> {
         let unsupported = ![
             schema,
