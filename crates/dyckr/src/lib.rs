@@ -111,3 +111,5 @@ pub mod lua_body_sanitizer;
 pub mod lua_writer_mode;
 pub mod lua_types;
 pub mod lua_line;
+pub mod lua_shadow;
+pub mod lua_shadow_writer;
