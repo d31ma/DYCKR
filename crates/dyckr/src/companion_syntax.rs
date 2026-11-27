@@ -170,3 +170,9 @@ pub fn swift_label(declaration: &str) -> String {
         Some(label) => format!("{label}: "),
     }
 }
+
+pub fn annotated_type(annotation: &str) -> Option<String> {
+    let after_colon = annotation.strip_prefix(':')?;
+    let before_value = after_colon.split('=').next().unwrap_or_default();
+    Some(before_value.trim().to_owned())
+}
