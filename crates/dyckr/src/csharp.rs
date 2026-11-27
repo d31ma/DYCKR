@@ -527,3 +527,22 @@ pub fn lower(module: &Module, runtime: &dyn Fn(&str, &str, &str, &str, &str, &st
     generated.push_str(unit_helper(module));
     crate::polyglot::render(module, edits, &generated)
 }
+pub fn runtime(
+    module_id: &str,
+    environment: &str,
+    registry: &str,
+    configurations: &str,
+    entities: &str,
+    policies: &str,
+    sources: &[&str],
+) -> String {
+    sources.concat()
+    .replace("__TAC_BEHAVIOR_MODULE__", &crate::csharp::quote(module_id))
+    .replace("__TAC_BEHAVIOR_ENVIRONMENT__", &crate::csharp::quote(environment))
+    .replace("__TAC_BEHAVIOR_REGISTRY__", &crate::csharp::quote(registry))
+    .replace("__TAC_BEHAVIOR_CONFIGURATIONS__", configurations)
+    .replace("__TAC_BEHAVIOR_ENTITIES__", entities)
+    .replace("__TAC_BEHAVIOR_TYPES__", policies)
+}
+
+
