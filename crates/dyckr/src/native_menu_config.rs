@@ -42,7 +42,6 @@ impl NativeMenuConfig {
             .try_for_each(|item| Self::require_document(item, index))
     }
 
-    #[cfg(test)]
     pub fn is_empty(&self) -> bool {
         self.groups().iter().all(|(_, entries)| entries.is_empty())
     }
@@ -133,7 +132,7 @@ impl NativeMenuConfig {
             })
     }
 
-    fn require_document(item: &NativeMenuEntry, index: &NativeRouteIndex) -> Result<(), Failure> {
+    pub fn require_document(item: &NativeMenuEntry, index: &NativeRouteIndex) -> Result<(), Failure> {
         item.route
             .as_deref()
             .map_or(Ok(()), |route| Self::require_page(&item.id, route, index))
