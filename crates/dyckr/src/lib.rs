@@ -233,3 +233,4 @@ pub mod go;
 pub mod companion_names;
 pub mod kotlin_member;
 pub mod rust_model_type;
+pub mod declaration_names;
