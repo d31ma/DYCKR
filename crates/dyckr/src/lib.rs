@@ -259,3 +259,4 @@ pub mod with_required_constructor;
 pub mod owner_table;
 pub mod module_id;
 pub mod behavior_scope;
+pub mod module_failure;
