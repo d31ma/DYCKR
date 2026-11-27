@@ -171,3 +171,4 @@ pub mod config_failure;
 pub mod blob_limits;
 pub mod browser_api_grants;
 pub mod storage_member;
+pub mod quoted_string_escape;
