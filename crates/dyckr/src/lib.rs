@@ -170,3 +170,4 @@ pub mod style_source;
 pub mod config_failure;
 pub mod blob_limits;
 pub mod browser_api_grants;
+pub mod storage_member;
