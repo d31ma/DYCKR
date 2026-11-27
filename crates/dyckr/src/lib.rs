@@ -153,3 +153,7 @@ pub mod cpp_source;
 pub mod cpp_failure;
 pub mod cpp_tokens;
 pub mod cpp_attributes;
+pub mod cpp_member_end;
+pub mod cpp_shape;
+pub mod cpp_step;
+pub mod cpp_declaration;
