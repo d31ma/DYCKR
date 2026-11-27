@@ -280,3 +280,4 @@ pub mod fsharp_markers;
 pub mod detached_csharp_consts;
 pub mod fsharp_view;
 pub mod fsharp_source_consts;
+pub mod detached_csharp;
