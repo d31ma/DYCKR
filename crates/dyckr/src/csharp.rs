@@ -311,3 +311,20 @@ pub fn constructor_parameters(type_declaration: &Type, fields: &[String]) -> Res
     }
     Ok(parameters.join(", "))
 }
+
+
+pub fn declared_exchange(
+    type_declaration: &Type,
+    method: &Method,
+    prefix: &str,
+) -> Result<String, String> {
+    if !method.asynchronous || !crate::csharp::is_task_json(&method.return_type) {
+        return Err("C# declared WebCall methods require async Task<BehaviorJSON>".to_owned());
+    }
+    let arguments = crate::csharp::json_arguments(method);
+    Ok(format!(
+        "\n{prefix}return await this.behaviors.Invoke({}, {}, new BehaviorJSON[] {{ {arguments} }}, () => System.Threading.Tasks.Task.FromResult(BehaviorJSON.Parse(\"null\")));\n",
+        crate::csharp::quote(&type_declaration.name),
+        crate::csharp::quote(&method.name)
+    ))
+}
