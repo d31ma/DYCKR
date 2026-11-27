@@ -107,3 +107,4 @@ pub mod event_module;
 pub mod http_client_source;
 pub mod shadow_lines;
 pub mod lua_lexer;
+pub mod lua_body_sanitizer;
