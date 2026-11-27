@@ -91,3 +91,4 @@ pub mod speculation_rules;
 pub mod view_transition_guard;
 pub mod base64;
 pub mod typescript_program;
+pub mod publish;

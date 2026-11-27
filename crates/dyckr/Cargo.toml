@@ -11,6 +11,7 @@ tachyon-diagnostics = { path = "../tachyon-diagnostics" }
 tachyon-contracts = { path = "../tachyon-contracts" }
 command-group = { version = "5.0.1", features = ["with-tokio"] }
 sha2 = "0.10"
+tempfile = "3"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 tokio = { version = "1.53.1", features = ["rt", "io-util", "process", "sync", "time", "macros"] }
