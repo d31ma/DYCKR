@@ -38,3 +38,21 @@ pub fn missing_type(name: &str, source_path: &str, language: &str) -> crate::fai
         crate::failure::source_span(source_path, 0, source_path.len()),
     ))
 }
+
+pub fn authored_table(source_path: &str) -> crate::failure::Failure {
+    crate::failure::Failure::one(crate::failure::diagnostic(
+        1405,
+        "Native companions require an owned class or struct, not an authored member table.",
+        None,
+        crate::failure::source_span(source_path, 0, source_path.len()),
+    ))
+}
+
+pub fn missing_constructor(source_path: &str, name: &str) -> crate::failure::Failure {
+    crate::failure::Failure::one(crate::failure::diagnostic(
+        1406,
+        format!("Companion struct '{name}' needs a constructor."),
+        Some("Add fn new() -> Self or implement Default.".into()),
+        crate::failure::source_span(source_path, 0, source_path.len()),
+    ))
+}
