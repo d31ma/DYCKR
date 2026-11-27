@@ -104,3 +104,4 @@ pub mod lua_syntax;
 pub mod yard;
 pub mod behavior_literal;
 pub mod event_module;
+pub mod http_client_source;
