@@ -122,3 +122,23 @@ pub fn is_task_json(value: &str) -> bool {
 pub fn returns_json_or_task_json(method: &Method) -> bool {
     crate::csharp::is_json(&method.return_type) || (method.asynchronous && crate::csharp::is_task_json(&method.return_type))
 }
+
+
+pub fn is_validation_only(method: &Method) -> bool {
+    method.metadata.len() == 1 && method.metadata.contains_key("valid")
+}
+
+pub fn is_declared_exchange(method: &Method) -> bool {
+    let Some(exchange) = method.metadata.get("httpExchange") else {
+        return false;
+    };
+    exchange.get("generated").is_some()
+}
+
+pub fn uses_invocation(method: &Method) -> bool {
+    method.metadata.contains_key("cacheable")
+        || method.metadata.contains_key("httpExchange")
+        || method.asynchronous
+        || method.metadata.contains_key("cacheEvict")
+        || method.metadata.contains_key("cachePut")
+}
