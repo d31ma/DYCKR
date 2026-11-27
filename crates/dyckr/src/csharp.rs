@@ -105,3 +105,20 @@ pub fn property_entries(unit: &Unit) -> String {
         format!("[{}] = {}, ", crate::csharp::quote(&name), crate::csharp::quote(&text))
     })
 }
+
+
+pub fn is_json(value: &str) -> bool {
+    value.trim() == "BehaviorJSON"
+}
+
+pub fn is_task_json(value: &str) -> bool {
+    let without_spaces = value.split_whitespace().collect::<String>();
+    matches!(
+        without_spaces.as_str(),
+        "Task<BehaviorJSON>" | "System.Threading.Tasks.Task<BehaviorJSON>"
+    )
+}
+
+pub fn returns_json_or_task_json(method: &Method) -> bool {
+    crate::csharp::is_json(&method.return_type) || (method.asynchronous && crate::csharp::is_task_json(&method.return_type))
+}
