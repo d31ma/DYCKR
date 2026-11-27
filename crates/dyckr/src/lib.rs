@@ -134,3 +134,5 @@ pub mod fsharp_value;
 pub mod fsharp_member_line;
 pub mod fsharp_member_words;
 pub mod fsharp_member_header;
+pub mod fsharp_shadow;
+pub mod fsharp_shadow_writer;
