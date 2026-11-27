@@ -271,3 +271,4 @@ pub mod call_style;
 pub mod value_source;
 pub mod string_list;
 pub mod polyglot_unit;
+pub mod csharp_task_members;
