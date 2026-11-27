@@ -1,3 +1,19 @@
+pub const ROLE_SUFFIXES: [&'static str; 4] = ["Client", "Service", "Store", "Delegate"];
+
+pub const REQUESTS: [(&'static str, &'static str, &'static str); 5] = [
+        ("getrequest", "GET", "GetRequest"),
+        ("postrequest", "POST", "PostRequest"),
+        ("putrequest", "PUT", "PutRequest"),
+        ("patchrequest", "PATCH", "PatchRequest"),
+        ("deleterequest", "DELETE", "DeleteRequest"),
+    ];
+pub const PARAMETERS: [(&'static str, &'static str, &'static str); 4] = [
+        ("pathvariable", "pathVariables", "PathVariable"),
+        ("requestparam", "query", "RequestParam"),
+        ("requestbody", "body", "RequestBody"),
+        ("requestheader", "headers", "RequestHeader"),
+    ];
+
 pub struct HttpClientSource;
 use std::ops::Range;
 use std::path::Path;
@@ -40,5 +56,66 @@ impl HttpClientSource {
             .unwrap_or(name)
             .replace('_', "")
             .to_ascii_lowercase()
+    }
+}
+impl HttpClientSource {
+
+    pub fn request(name: &str) -> Option<(&'static str, &'static str)> {
+        for (marker, verb, written) in crate::http_client_source::REQUESTS {
+            if marker == name {
+                return Some((verb, written));
+            }
+        }
+        None
+    }
+
+    pub fn parameter(name: &str) -> Option<(&'static str, &'static str)> {
+        let name = HttpClientSource::normalized(name);
+        for (marker, key, written) in crate::http_client_source::PARAMETERS {
+            if marker == name {
+                return Some((key, written));
+            }
+        }
+        None
+    }
+
+    pub fn prefix(extension: &str) -> &'static str {
+        match extension {
+            "rs" | "php" | "rb" => "#[",
+            "cs" => "[",
+            _ => "@",
+        }
+    }
+
+    pub fn marker_text(extension: &str, name: &str, arguments: &str) -> String {
+        let written = if extension == "py" {
+            crate::renamed::RoutingRename::snake_case(name)
+        } else {
+            name.to_owned()
+        };
+        let call = if arguments.is_empty() {
+            written
+        } else {
+            format!("{written}({arguments})")
+        };
+        match Self::prefix(extension) {
+            "@" => format!("@{call}"),
+            opening => format!("{opening}{call}]"),
+        }
+    }
+
+    pub fn adapter_name(class: &str) -> String {
+        let mut stem = class;
+        for suffix in crate::http_client_source::ROLE_SUFFIXES {
+            if let Some(rest) = class.strip_suffix(suffix)
+                && !rest.is_empty()
+            {
+                stem = rest;
+                break;
+            }
+        }
+        let mut characters = stem.chars();
+        let first = characters.next().unwrap_or_default().to_ascii_lowercase();
+        format!("{first}{}", characters.as_str())
     }
 }
