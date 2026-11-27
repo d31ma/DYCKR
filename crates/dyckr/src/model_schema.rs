@@ -2,7 +2,6 @@ pub const CLIENT_LANGUAGES: [&'static str; 13] = [
         "java", "js", "ts", "py", "cs", "fs", "rs", "swift", "kt", "go", "dart", "rb", "lua",
     ];
 pub const CLIENT_MODELS: &'static str = "client/models";
-use std::path::Path;
 use crate::failure::Failure;
 use crate::behavior_input::Input;
 
@@ -55,4 +54,20 @@ pub fn require_schema(input: &Input<'_>, markers: &[crate::behavior_marker::Mark
                 ),
             )))
         })
+    }
+use crate::prepared::Prepared;
+use std::path::Path;
+
+
+    pub fn java_plain(path: &Path, source: &str) -> Result<Option<String>, crate::failure::Failure> {
+        let plain = crate::java_model_schema::JavaModelSchema::blanked(path, source)?;
+        Ok((plain != source).then_some(plain))
+    }
+
+    pub fn projection(prepared: Option<Prepared>) -> Result<String, String> {
+        match prepared {
+            Some(crate::prepared::Prepared::Annotated(module)) => crate::polyglot::render(&module, Vec::new(), ""),
+            Some(crate::prepared::Prepared::Erased(source)) => Ok(source),
+            None => Err("Model schema metadata was not consumed".to_owned()),
+        }
     }
