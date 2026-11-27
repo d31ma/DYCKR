@@ -49,7 +49,6 @@ pub fn json_arguments(method: &Method) -> String {
     }
     arguments.join(", ")
 }
-use crate::behavior_unit::Unit;
 
 
 pub fn joined<T>(items: impl IntoIterator<Item = T>, spell: impl Fn(T) -> String) -> String {
@@ -74,7 +73,7 @@ pub fn test_context(unit: &Unit) -> String {
 pub fn case_names(calls: &[(String, String)]) -> String {
     let mut names = Vec::new();
     for (name, _) in calls {
-        names.push(crate::csharp::quote(name));
+        names.push(crate::csharp::quote(&name));
     }
     names.join(", ")
 }
@@ -439,3 +438,47 @@ impl CsharpErrorBody {
     }
 }
 
+use crate::behavior_unit::Unit;
+
+
+pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) -> String {
+    let (report, answer) = if environment == "tac" {
+        ("string", "report.ToString()")
+    } else {
+        (
+            "object",
+            "System.Text.Json.Nodes.JsonNode.Parse(report.ToString())",
+        )
+    };
+    let names = crate::csharp::case_names(&calls);
+    let dispatch = crate::csharp::joined(calls.iter().cloned(), |(name, call)| {
+        format!("case {}: RunCaseBody(() => {call}); return;", crate::csharp::quote(&name))
+    });
+    let context = crate::csharp::test_context(unit);
+    let cleared_fakes = crate::csharp::joined(&unit.mocks, |name| format!("this.{name} = default;\n"));
+    format!(
+        "\npublic BehaviorContext behaviors;\n\
+         public void startBehaviors() {{ stopBehaviors(); this.behaviors = {context}; }}\n\
+         public void stopBehaviors() {{ if (this.behaviors != null) {{ this.behaviors.Dispose(); this.behaviors = null; }} }}\n\
+         static void RunCaseBody(System.Action body) => body();\n\
+         static void RunCaseBody(System.Func<System.Threading.Tasks.Task> body) => body().GetAwaiter().GetResult();\n\
+         void runCase(string name) {{ switch (name) {{ {dispatch} default: return; }} }}\n\
+         public {report} POST() {{\n\
+         var cases = new System.Collections.Generic.List<BehaviorJSON>();\n\
+         foreach (var name in new string[] {{{names}}}) {{\n\
+         {cleared_fakes}\
+         startBehaviors();\n\
+         BehaviorCalls.TakeJson();\n\
+         try {{ runCase(name); cases.Add(BehaviorJSON.Parse(\"{{\\\"name\\\":\" + Quoted(name) + \",\\\"passed\\\":true,\\\"called\\\":\" + BehaviorCalls.TakeJson() + \"}}\")); }}\n\
+         catch (System.Exception error) {{ cases.Add(BehaviorJSON.Parse(\"{{\\\"name\\\":\" + Quoted(name) + \",\\\"passed\\\":false,\\\"error\\\":\" + Quoted(error.Message ?? \"failed\") + \",\\\"called\\\":\" + BehaviorCalls.TakeJson() + \"}}\")); }}\n\
+         finally {{ stopBehaviors(); }}\n\
+         }}\n\
+         var report = BehaviorJSON.Object(new System.Collections.Generic.Dictionary<string, BehaviorJSON> {{\n\
+         [\"unit\"] = BehaviorJSON.From({}), [\"cases\"] = BehaviorJSON.Array(cases.ToArray()),\n\
+         }});\n\
+         return {answer};\n\
+         }}\n\
+         static string Quoted(string value) => BehaviorJSON.Quote(value);\n",
+        crate::csharp::quote(&unit.name),
+    )
+}
