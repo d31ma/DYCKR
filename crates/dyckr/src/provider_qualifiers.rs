@@ -1,9 +1,11 @@
 use serde_json::{Value, json};
 use crate::prepared::Prepared;
 
+pub struct ProviderQualifiers;
 
-    pub fn prepared(prepared: Option<&crate::prepared::Prepared>, class: &str) -> Value {
-        let Some(crate::prepared::Prepared::Annotated(module)) = prepared else {
+impl ProviderQualifiers {
+    pub fn read(prepared: Option<&Prepared>, class: &str) -> Value {
+        let Some(Prepared::Annotated(module)) = prepared else {
             return json!({});
         };
         module
@@ -14,3 +16,4 @@ use crate::prepared::Prepared;
             .cloned()
             .unwrap_or_else(|| json!({}))
     }
+}
