@@ -119,6 +119,7 @@ dependencies = [
  "command-group",
  "serde",
  "serde_json",
+ "tachyon-contracts",
  "tachyon-diagnostics",
  "tokio",
 ]
