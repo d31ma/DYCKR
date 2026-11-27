@@ -74,3 +74,7 @@ pub mod stream_query;
 pub mod stream_event_name;
 pub mod php_doc;
 pub mod without_bom;
+pub mod web_event_sender;
+pub mod web_event_models;
+pub mod web_event_sources;
+pub mod language_kinds;

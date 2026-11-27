@@ -1,0 +1,675 @@
+use crate::model::{Model, ModelField, Record};
+use crate::shape::Shape;
+use crate::web_event_sender::WebEventSender;
+
+pub struct WebEventModels;
+
+impl WebEventModels {
+    pub const APPLICATION_STATE: &'static str = "ApplicationStateChanged";
+    const MEDIA_GRANTS: [&'static str; 3] = ["camera", "microphone", "screen"];
+    const STATS_NUMBERS: [&'static str; 10] = [
+        "bitrate",
+        "packetsLost",
+        "lossPercent",
+        "jitterMs",
+        "roundTripMs",
+        "framesPerSecond",
+        "width",
+        "height",
+        "index",
+        "count",
+    ];
+
+    pub fn models() -> Vec<(String, Model)> {
+        Self::rows().into_iter().map(Self::without_sender).collect()
+    }
+
+    pub fn models_except(own: &[String]) -> Vec<(String, Model)> {
+        let mut models = Self::models();
+        models.retain(|(name, _)| Self::built_in_only(own, name));
+        models
+    }
+
+    fn built_in_only(own: &[String], name: &String) -> bool {
+        !own.contains(name)
+    }
+
+    pub fn names_except(own: &[String]) -> Vec<String> {
+        Self::models_except(own)
+            .into_iter()
+            .map(|(name, _)| name)
+            .collect()
+    }
+
+    pub fn sender(name: &str) -> Option<WebEventSender> {
+        Self::rows()
+            .into_iter()
+            .find(|row| Self::is_row(row, name))
+            .map(|(sender, _, _)| sender)
+    }
+
+    fn is_row((_, row, _): &(WebEventSender, String, Model), name: &str) -> bool {
+        row == name
+    }
+
+    fn without_sender((_, name, model): (WebEventSender, String, Model)) -> (String, Model) {
+        (name, model)
+    }
+
+    fn rows() -> Vec<(WebEventSender, String, Model)> {
+        [
+            Self::page_rows(),
+            Self::prompt_rows(),
+            Self::file_rows(),
+            Self::push_rows(),
+            Self::storage_rows(),
+            Self::passkey_rows(),
+            Self::peer_rows(),
+            Self::media_rows(),
+            Self::media_call_rows(),
+            Self::recorder_rows(),
+            Self::code_scanner_rows(),
+            Self::crypto_rows(),
+            Self::blob_rows(),
+            Self::socket_and_failure_rows(),
+            Self::store_rows(),
+            Self::lock_rows(),
+        ]
+        .concat()
+    }
+
+    fn store_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Page,
+                "StorePartitionLoaded",
+                &[
+                    ("table", Shape::Text),
+                    ("partition", Shape::Text),
+                    ("rows", Shape::Number),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "StorePartitionFailed",
+                &[
+                    ("table", Shape::Text),
+                    ("partition", Shape::Text),
+                    ("reason", Shape::Text),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "StoreWriteFailed",
+                &[("table", Shape::Text), ("reason", Shape::Text)],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "StoreChanged",
+                &[("table", Shape::Text), ("partition", Shape::Text)],
+            ),
+        ]
+    }
+
+    fn lock_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![Self::record(
+            WebEventSender::Grant("locks"),
+            "LockGranted",
+            &[("name", Shape::Text)],
+        )]
+    }
+
+    fn page_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Page,
+                Self::APPLICATION_STATE,
+                &[("state", Shape::Text)],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "ConnectivityChanged",
+                &[("online", Shape::Boolean)],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "VisibilityChanged",
+                &[("visible", Shape::Boolean)],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "PreferencesChanged",
+                &[
+                    ("scheme", Shape::Text),
+                    ("motion", Shape::Text),
+                    ("language", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn prompt_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Grant("clipboard"),
+                "ClipboardTextRead",
+                &[("text", Shape::Text)],
+            ),
+            Self::record(WebEventSender::Grant("share"), "ShareFinished", &[]),
+            Self::record(
+                WebEventSender::Grant("notifications"),
+                "NotificationPermissionChanged",
+                &[("permission", Shape::Text)],
+            ),
+            Self::record(
+                WebEventSender::Grant("geolocation"),
+                "PositionFound",
+                &[
+                    ("latitude", Shape::Number),
+                    ("longitude", Shape::Number),
+                    ("accuracy", Shape::Number),
+                    ("timestamp", Shape::Number),
+                ],
+            ),
+        ]
+    }
+
+    fn file_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Grant("files"),
+                "FilePicked",
+                &Self::file_fields(&[]),
+            ),
+            Self::record(WebEventSender::Grant("files"), "FilePickCancelled", &[]),
+            Self::record(
+                WebEventSender::Grant("files"),
+                "FileDropped",
+                &Self::file_fields(&[("zone", Shape::Text)]),
+            ),
+            Self::record(
+                WebEventSender::Grant("files"),
+                "FileChunkRead",
+                &[
+                    ("id", Shape::Text),
+                    ("offset", Shape::Number),
+                    ("size", Shape::Number),
+                    ("data", Shape::Text),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("files"),
+                "UploadFinished",
+                &[
+                    ("upload", Shape::Text),
+                    ("id", Shape::Text),
+                    ("status", Shape::Number),
+                    ("body", Shape::Text),
+                    ("truncated", Shape::Boolean),
+                    ("error", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn push_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Grant("push"),
+                "PushSubscribed",
+                &[
+                    ("endpoint", Shape::Text),
+                    ("p256dh", Shape::Text),
+                    ("auth", Shape::Text),
+                    ("expirationTime", Shape::Number),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("push"),
+                "PushUnsubscribed",
+                &[("endpoint", Shape::Text)],
+            ),
+            Self::record(
+                WebEventSender::Grant("push"),
+                "PushReceived",
+                &[
+                    ("tag", Shape::Text),
+                    ("path", Shape::Text),
+                    ("data", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn storage_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Page,
+                "StorageEstimated",
+                &[
+                    ("usage", Shape::Number),
+                    ("quota", Shape::Number),
+                    ("persisted", Shape::Boolean),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("persistentStorage"),
+                "StoragePersisted",
+                &[("persisted", Shape::Boolean)],
+            ),
+        ]
+    }
+
+    fn code_scanner_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Grant("camera"),
+                "CodeScanned",
+                &[("text", Shape::Text)],
+            ),
+            Self::record(
+                WebEventSender::Grant("camera"),
+                "ScanFailed",
+                &[("reason", Shape::Text)],
+            ),
+        ]
+    }
+
+    fn passkey_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Grant("passkeys"),
+                "PasskeyFailed",
+                &[
+                    ("call", Shape::Text),
+                    ("reason", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("passkeys"),
+                "PasskeySupport",
+                &[
+                    ("platform", Shape::Boolean),
+                    ("conditional", Shape::Boolean),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("passkeys"),
+                "PasskeyCreated",
+                &[
+                    ("credentialJson", Shape::Text),
+                    ("prfKey", Shape::Text),
+                    ("prfSecondKey", Shape::Text),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Grant("passkeys"),
+                "PasskeyAsserted",
+                &[
+                    ("credentialJson", Shape::Text),
+                    ("conditional", Shape::Boolean),
+                    ("prfKey", Shape::Text),
+                    ("prfSecondKey", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn media_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::media(
+                "MediaDeviceFound",
+                &[
+                    ("request", Shape::Text),
+                    ("id", Shape::Text),
+                    ("kind", Shape::Text),
+                    ("label", Shape::Text),
+                    ("chosen", Shape::Boolean),
+                    ("index", Shape::Number),
+                    ("count", Shape::Number),
+                ],
+            ),
+            Self::media("MediaDevicesChanged", &[]),
+            Self::media("MediaSpeakerChosen", &[("device", Shape::Text)]),
+            Self::media(
+                "MediaTrackStarted",
+                &[
+                    ("track", Shape::Text),
+                    ("kind", Shape::Text),
+                    ("device", Shape::Text),
+                    ("label", Shape::Text),
+                    ("width", Shape::Number),
+                    ("height", Shape::Number),
+                ],
+            ),
+            Self::media(
+                "MediaTrackEnded",
+                &[("track", Shape::Text), ("reason", Shape::Text)],
+            ),
+            Self::media("MediaFrameKeyReady", &[("keyId", Shape::Number)]),
+            Self::media(
+                "MediaFrameKeyMissing",
+                &[("track", Shape::Text), ("keyId", Shape::Number)],
+            ),
+            Self::media(
+                "MediaFrameRejected",
+                &[("track", Shape::Text), ("count", Shape::Number)],
+            ),
+            Self::media(
+                "MediaCallActive",
+                &[("on", Shape::Boolean), ("background", Shape::Boolean)],
+            ),
+            Self::media(
+                "MediaFailed",
+                &[
+                    ("track", Shape::Text),
+                    ("call", Shape::Text),
+                    ("reason", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn media_call_rows() -> Vec<(WebEventSender, String, Model)> {
+        let text = |name| (name, Shape::Text);
+        let flag = |name| (name, Shape::Boolean);
+        let stats: Vec<(&str, Shape)> = [
+            "request",
+            "connection",
+            "track",
+            "layer",
+            "direction",
+            "kind",
+        ]
+        .map(text)
+        .into_iter()
+        .chain(Self::STATS_NUMBERS.map(|name| (name, Shape::Number)))
+        .collect();
+        vec![
+            Self::media("MediaSending", &[text("connection"), text("track")]),
+            Self::media(
+                "MediaTrackArrived",
+                &["connection", "track", "kind", "stream"].map(text),
+            ),
+            Self::media("MediaTrackMuted", &[text("track"), flag("muted")]),
+            Self::media("MediaStats", &stats),
+            Self::media("MediaSpeaking", &[text("track"), flag("speaking")]),
+            Self::media("MediaLoudest", &[text("track")]),
+            Self::media("MediaAudioBlocked", &[]),
+        ]
+    }
+
+    fn recorder_rows() -> Vec<(WebEventSender, String, Model)> {
+        let recording = || ("recording", Shape::Text);
+        let measured = || {
+            [
+                recording(),
+                ("bytes", Shape::Number),
+                ("seconds", Shape::Number),
+            ]
+        };
+        vec![
+            Self::media(
+                "RecordingStarted",
+                &[
+                    recording(),
+                    ("format", Shape::Text),
+                    ("fileName", Shape::Text),
+                ],
+            ),
+            Self::media("RecordingPaused", &[recording()]),
+            Self::media("RecordingResumed", &[recording()]),
+            Self::media("RecordingProgress", &measured()),
+            Self::media("RecordingStopped", &measured()),
+            Self::media(
+                "RecordingFailed",
+                &[
+                    recording(),
+                    ("call", Shape::Text),
+                    ("reason", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn media(name: &str, fields: &[(&str, Shape)]) -> (WebEventSender, String, Model) {
+        Self::record(WebEventSender::AnyGrant(&Self::MEDIA_GRANTS), name, fields)
+    }
+
+    fn crypto_rows() -> Vec<(WebEventSender, String, Model)> {
+        let request = || ("request", Shape::Text);
+        vec![
+            Self::crypto_record(
+                "CryptoSupport",
+                &[
+                    request(),
+                    ("x25519", Shape::Boolean),
+                    ("ed25519", Shape::Boolean),
+                    ("aesGcm", Shape::Boolean),
+                    ("hkdf", Shape::Boolean),
+                    ("pbkdf2", Shape::Boolean),
+                    ("keyStore", Shape::Text),
+                ],
+            ),
+            Self::crypto_record(
+                "CryptoKeyMade",
+                &[request(), ("key", Shape::Text), ("publicKey", Shape::Text)],
+            ),
+            Self::crypto_record("CryptoSigned", &[request(), ("signature", Shape::Text)]),
+            Self::crypto_record("CryptoVerified", &[request(), ("valid", Shape::Boolean)]),
+            Self::crypto_record("CryptoEncrypted", &[request(), ("sealed", Shape::Text)]),
+            Self::crypto_record("CryptoDecrypted", &[request(), ("data", Shape::Text)]),
+            Self::crypto_record("CryptoDerived", &[request(), ("bytes", Shape::Text)]),
+            Self::crypto_record("CryptoHashed", &[request(), ("digest", Shape::Text)]),
+            Self::crypto_record("CryptoForgotten", &[request()]),
+            Self::crypto_record(
+                "CryptoFailed",
+                &[
+                    request(),
+                    ("call", Shape::Text),
+                    ("reason", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn crypto_record(name: &str, fields: &[(&str, Shape)]) -> (WebEventSender, String, Model) {
+        Self::record(WebEventSender::Grant("crypto"), name, fields)
+    }
+
+    fn blob_rows() -> Vec<(WebEventSender, String, Model)> {
+        let blob = WebEventSender::Grant("blobs");
+        vec![
+            Self::record(blob, "BlobSaved", &Self::blob_fields(&[])),
+            Self::record(
+                blob,
+                "BlobFailed",
+                &[
+                    ("call", Shape::Text),
+                    ("key", Shape::Text),
+                    ("reason", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+            Self::record(
+                blob,
+                "BlobChunkRead",
+                &[
+                    ("key", Shape::Text),
+                    ("offset", Shape::Number),
+                    ("size", Shape::Number),
+                    ("data", Shape::Text),
+                ],
+            ),
+            Self::record(
+                blob,
+                "BlobFound",
+                &Self::blob_fields(&[
+                    ("saved", Shape::Number),
+                    ("index", Shape::Number),
+                    ("count", Shape::Number),
+                ]),
+            ),
+            Self::record(
+                blob,
+                "BlobsListed",
+                &[
+                    ("prefix", Shape::Text),
+                    ("count", Shape::Number),
+                    ("bytes", Shape::Number),
+                    ("usedBytes", Shape::Number),
+                    ("maxBytes", Shape::Number),
+                ],
+            ),
+            Self::record(
+                blob,
+                "BlobRemoved",
+                &[("key", Shape::Text), ("bytes", Shape::Number)],
+            ),
+            Self::record(
+                blob,
+                "BlobOpened",
+                &[("key", Shape::Text), ("url", Shape::Text)],
+            ),
+            Self::record(
+                blob,
+                "BlobUploaded",
+                &[
+                    ("upload", Shape::Text),
+                    ("key", Shape::Text),
+                    ("status", Shape::Number),
+                    ("body", Shape::Text),
+                    ("truncated", Shape::Boolean),
+                    ("error", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    fn blob_fields(extra: &[(&'static str, Shape)]) -> Vec<(&'static str, Shape)> {
+        let mut fields = vec![
+            ("key", Shape::Text),
+            ("bytes", Shape::Number),
+            ("media", Shape::Text),
+            ("sha256", Shape::Text),
+        ];
+        fields.extend_from_slice(extra);
+        fields
+    }
+
+    fn peer_rows() -> Vec<(WebEventSender, String, Model)> {
+        let connection = || ("connection", Shape::Text);
+        let channel = || ("channel", Shape::Text);
+        vec![
+            Self::peer_record(
+                "PeerDescription",
+                &[connection(), ("kind", Shape::Text), ("sdp", Shape::Text)],
+            ),
+            Self::peer_record(
+                "PeerCandidate",
+                &[connection(), ("candidateJson", Shape::Text)],
+            ),
+            Self::peer_record("PeerState", &[connection(), ("state", Shape::Text)]),
+            Self::peer_record("PeerNegotiationNeeded", &[connection()]),
+            Self::peer_record(
+                "PeerChannelOpened",
+                &[
+                    connection(),
+                    channel(),
+                    ("label", Shape::Text),
+                    ("ordered", Shape::Boolean),
+                    ("remote", Shape::Boolean),
+                ],
+            ),
+            Self::peer_record("PeerChannelReady", &[connection(), channel()]),
+            Self::peer_record(
+                "PeerMessage",
+                &[connection(), channel(), ("data", Shape::Text)],
+            ),
+            Self::peer_record("PeerChannelClosed", &[connection(), channel()]),
+            Self::peer_failure(),
+        ]
+    }
+
+    fn peer_record(name: &str, fields: &[(&str, Shape)]) -> (WebEventSender, String, Model) {
+        Self::record(WebEventSender::Grant("peers"), name, fields)
+    }
+
+    fn peer_failure() -> (WebEventSender, String, Model) {
+        let fields = ["connection", "call", "reason", "message"].map(|field| (field, Shape::Text));
+        Self::peer_record("PeerFailed", &fields)
+    }
+
+    fn socket_and_failure_rows() -> Vec<(WebEventSender, String, Model)> {
+        vec![
+            Self::record(
+                WebEventSender::Socket,
+                "SocketOpened",
+                &[("path", Shape::Text), ("reconnected", Shape::Boolean)],
+            ),
+            Self::record(
+                WebEventSender::Socket,
+                "SocketClosed",
+                &[
+                    ("path", Shape::Text),
+                    ("code", Shape::Number),
+                    ("reconnecting", Shape::Boolean),
+                ],
+            ),
+            Self::record(
+                WebEventSender::Page,
+                "BrowserCallFailed",
+                &[
+                    ("api", Shape::Text),
+                    ("call", Shape::Text),
+                    ("message", Shape::Text),
+                ],
+            ),
+        ]
+    }
+
+    pub fn names() -> Vec<String> {
+        Self::models().into_iter().map(|(name, _)| name).collect()
+    }
+
+    pub fn page_names() -> Vec<String> {
+        Self::names()
+            .into_iter()
+            .filter(|name| name != Self::APPLICATION_STATE)
+            .collect()
+    }
+
+    fn file_fields(extra: &[(&'static str, Shape)]) -> Vec<(&'static str, Shape)> {
+        let mut fields = extra.to_vec();
+        fields.extend([
+            ("id", Shape::Text),
+            ("name", Shape::Text),
+            ("size", Shape::Number),
+            ("media", Shape::Text),
+            ("sha256", Shape::Text),
+            ("index", Shape::Number),
+            ("count", Shape::Number),
+        ]);
+        fields
+    }
+
+    fn record(
+        sender: WebEventSender,
+        name: &str,
+        fields: &[(&str, Shape)],
+    ) -> (WebEventSender, String, Model) {
+        let mut record = Record::default();
+        for (field, shape) in fields {
+            record.fields.push(ModelField {
+                name: String::from(*field),
+                shape: shape.clone(),
+                required: true,
+            });
+        }
+        (sender, String::from(name), Model::Record(record))
+    }
+}
