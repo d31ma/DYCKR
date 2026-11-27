@@ -1,3 +1,8 @@
+
+pub struct RequestEdit {
+    pub marker: String,
+    pub blanks: Vec<(Range<usize>, String)>,
+}
 pub const TAC: &'static str = "tac";
 pub const BROWSER_SCRIPTS: [&'static str; 2] = ["js", "ts"];
 pub const CLASS: &'static str = "httpclient";
