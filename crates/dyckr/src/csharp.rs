@@ -182,3 +182,20 @@ pub fn pageable_line(method: &Method, policy: &Value) -> Result<String, String> 
         crate::csharp::quote(&crate::sorted_json::SortedJson::text(policy))
     ))
 }
+
+
+pub fn validation_prefix(method: &Method) -> Result<String, String> {
+    let Some(policy) = method.metadata.get("valid") else {
+        return Ok(String::new());
+    };
+    let parameter = crate::csharp::parameter_at(method, policy, "Check")?;
+    if !crate::csharp::is_json(&parameter.type_source) {
+        return Err("C# Check parameters require BehaviorJSON".to_owned());
+    }
+    Ok(format!(
+        "{} = Behaviors.CheckSchema(BehaviorJSON.Parse({}), {});\n",
+        parameter.name,
+        crate::csharp::quote(&crate::sorted_json::SortedJson::text(&policy["schema"])),
+        parameter.name
+    ))
+}
