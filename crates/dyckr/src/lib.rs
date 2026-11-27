@@ -126,3 +126,7 @@ pub mod fsharp_type_form;
 pub mod fsharp_record_fields;
 pub mod fsharp_type_header;
 pub mod fsharp_field_needs;
+pub mod fsharp_source_line;
+pub mod fsharp_open_block;
+pub mod fsharp_body;
+pub mod fsharp_lines;
