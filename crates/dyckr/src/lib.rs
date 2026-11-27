@@ -7,3 +7,7 @@ pub mod failure;
 pub mod node_driver;
 pub mod python_parameters;
 pub mod wasm_optimizer;
+pub mod ttid;
+pub mod web_api_clients;
+pub mod helper_new_call;
+pub mod class_name_from_file;
