@@ -91,7 +91,7 @@ impl Yard {
         None
     }
 
-    fn first_word(text: &str) -> &str {
+    pub fn first_word(text: &str) -> &str {
         AsciiName::leading(text.trim_start())
     }
 }

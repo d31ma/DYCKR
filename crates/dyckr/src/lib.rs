@@ -102,3 +102,4 @@ pub mod dotnet_model_languages;
 pub mod fsharp_syntax;
 pub mod lua_syntax;
 pub mod yard;
+pub mod behavior_literal;
