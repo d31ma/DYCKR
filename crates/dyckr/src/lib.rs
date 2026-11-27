@@ -251,3 +251,4 @@ pub mod rust_held_fields;
 pub mod rust_owner_table;
 pub mod rust_graph;
 pub mod class_table;
+pub mod behavior_module;
