@@ -198,3 +198,5 @@ pub mod native_menu_config;
 pub mod valid_icon_source;
 pub mod native_tray;
 pub mod rust_companion_crate;
+pub mod native_tool_failure;
+pub mod rust_native_libraries;
