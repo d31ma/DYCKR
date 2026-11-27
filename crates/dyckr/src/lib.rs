@@ -202,3 +202,4 @@ pub mod native_tool_failure;
 pub mod rust_native_libraries;
 pub mod rust_companion_output;
 pub mod build_profile;
+pub mod linkage;
