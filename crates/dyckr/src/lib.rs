@@ -226,3 +226,4 @@ pub mod java_builtins;
 pub mod lower_first;
 pub mod declares_table;
 pub mod modifiers;
+pub mod companion_syntax;
