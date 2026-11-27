@@ -115,3 +115,7 @@ pub mod lua_shadow;
 pub mod lua_shadow_writer;
 pub mod lua_models;
 pub mod fsharp_lexer;
+pub mod fsharp_block_kind;
+pub mod fsharp_line_kind;
+pub mod fsharp_field_need;
+pub mod fsharp_type;
