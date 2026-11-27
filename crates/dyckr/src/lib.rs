@@ -121,3 +121,6 @@ pub mod fsharp_field_need;
 pub mod fsharp_type;
 pub mod fsharp_attribute_line;
 pub mod fsharp_parameters;
+pub mod fsharp_type_name;
+pub mod fsharp_type_form;
+pub mod fsharp_record_fields;
