@@ -423,3 +423,19 @@ pub fn lower_methods(
     }
     Ok(methods)
 }
+
+pub struct CsharpErrorBody;
+
+impl CsharpErrorBody {
+    pub const READER: &'static str = "TryReadBody";
+    pub const SOURCE: &'static str = "public sealed partial class BehaviorError {\n    public bool TryReadBody<T>(out T model) => TacModels.ReadErrorBody(Body?.ToString(), out model);\n}\n";
+
+    pub fn reader(module: &Module) -> &'static str {
+        let wanted = [
+            module.environment == "tac",
+            module.source.contains(Self::READER),
+        ] == [true, true];
+        ["", Self::SOURCE][usize::from(wanted)]
+    }
+}
+
