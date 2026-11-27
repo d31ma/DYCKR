@@ -130,3 +130,7 @@ pub mod fsharp_source_line;
 pub mod fsharp_open_block;
 pub mod fsharp_body;
 pub mod fsharp_lines;
+pub mod fsharp_value;
+pub mod fsharp_member_line;
+pub mod fsharp_member_words;
+pub mod fsharp_member_header;
