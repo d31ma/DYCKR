@@ -292,3 +292,4 @@ pub mod visible_code;
 pub mod annotation_rule;
 pub mod lua_view;
 pub mod parameter_markers;
+pub mod role;
