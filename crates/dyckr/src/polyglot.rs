@@ -96,3 +96,24 @@ pub fn concrete(language: &str) -> &'static str {
         _ => "class",
     }
 }
+
+pub fn blank_out(text: &str) -> String {
+    let mut blanked = String::with_capacity(text.len());
+    for byte in text.bytes() {
+        if matches!(byte, b'\n' | b'\r') {
+            blanked.push(char::from(byte));
+        } else {
+            blanked.push(' ');
+        }
+    }
+    blanked
+}
+
+pub fn erase(source: &str, markers: &[crate::behavior_marker::Marker]) -> String {
+    let mut output = source.to_owned();
+    for marker in markers.iter().rev() {
+        let blanked = crate::polyglot::blank_out(&source[marker.span.clone()]);
+        output.replace_range(marker.span.clone(), &blanked);
+    }
+    output
+}
