@@ -238,3 +238,4 @@ pub mod declared_service;
 pub mod owner_name;
 pub mod companion_converters;
 pub mod constructor_field_policy;
+pub mod rust_collaborators;
