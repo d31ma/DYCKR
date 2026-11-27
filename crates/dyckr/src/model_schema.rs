@@ -75,6 +75,29 @@ pub struct ModelSchema;
 
 impl ModelSchema {
 
+    pub fn polyglot_projection(
+        input: &crate::behavior_input::Input<'_>,
+        language: &str,
+        environment: &str,
+        annotations: &dyn Fn(&crate::behavior_input::Input<'_>, &str, &str) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>,
+        prepare: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<crate::prepared::Prepared>, crate::failure::Failure>,
+    ) -> Result<String, crate::failure::Failure> {
+        let markers = annotations(input, language, environment)?;
+        Self::project(input, &markers, environment, prepare)
+    }
+
+    pub fn project(
+        input: &crate::behavior_input::Input<'_>,
+        markers: &[crate::behavior_marker::Marker],
+        environment: &str,
+        prepare: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<crate::prepared::Prepared>, crate::failure::Failure>,
+    ) -> Result<String, crate::failure::Failure> {
+        crate::model_schema::require_schema(input, markers)?;
+        let prepared = prepare(input.path, input.source, environment)?;
+        crate::model_schema::projection(prepared).map_err(|message| input.failure(0, message))
+    }
+
+
     pub fn script_marked(input: &crate::behavior_input::Input<'_>, markers_fn: &dyn Fn(&crate::behavior_input::Input<'_>) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>, lower_fn: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<Option<String>, Failure> {
         let markers = markers_fn(input)?;
         let schema = markers
