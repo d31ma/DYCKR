@@ -206,3 +206,5 @@ pub mod linkage;
 pub mod rust_wasm_cache;
 pub mod cache;
 pub mod native_rust_project;
+pub mod native_config;
+pub mod native_site;
