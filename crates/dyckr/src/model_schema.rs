@@ -75,6 +75,24 @@ pub struct ModelSchema;
 
 impl ModelSchema {
 
+    pub fn script_marked(input: &crate::behavior_input::Input<'_>, markers_fn: &dyn Fn(&crate::behavior_input::Input<'_>) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>, lower_fn: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<Option<String>, Failure> {
+        let markers = markers_fn(input)?;
+        let schema = markers
+            .iter()
+            .any(|marker| crate::schema_marker_names::NAMES.contains(&marker.name.as_str()));
+        schema
+            .then(|| Self::script_projection(input, &markers, lower_fn))
+            .transpose()
+    }
+
+    pub fn script_projection(input: &crate::behavior_input::Input<'_>, markers: &[crate::behavior_marker::Marker], lower_fn: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<String, crate::failure::Failure> {
+        crate::model_schema::require_schema(input, markers)?;
+        let environment = ["yon", "tac"][usize::from(input.path.starts_with("client"))];
+        lower_fn(input.path, input.source, environment)?;
+        Ok(crate::polyglot::erase(input.source, markers))
+    }
+
+
     pub fn native_plain(path: &Path, source: &str, script_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>, polyglot_plain: fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<Option<String>, Failure> {
         let extension = path
             .extension()
