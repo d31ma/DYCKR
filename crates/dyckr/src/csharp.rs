@@ -328,3 +328,33 @@ pub fn declared_exchange(
         crate::csharp::quote(&method.name)
     ))
 }
+
+
+pub fn method_body(
+    type_declaration: &Type,
+    method: &Method,
+    prefix: &str,
+    body: &str,
+    exchange_body: &dyn Fn(&Type, &Method, &str) -> Option<String>,
+) -> Result<String, String> {
+    if let Some(body) =
+        exchange_body(type_declaration, method, prefix)
+    {
+        return Ok(body);
+    }
+    if crate::csharp::is_validation_only(method) {
+        return crate::csharp::validation_only_body(method, prefix, body);
+    }
+    if crate::csharp::is_declared_exchange(method) {
+        return crate::csharp::declared_exchange(type_declaration, method, prefix);
+    }
+    if crate::csharp::uses_invocation(method) {
+        return crate::csharp::invocation_body(type_declaration, method, prefix, body);
+    }
+    if method.return_type.trim() == "void" {
+        return Err("C# Pageable methods must return a value".to_owned());
+    }
+    Ok(format!(
+        "\n{prefix}return this.behaviors.Paginate(() => {{ {body} }});\n"
+    ))
+}
