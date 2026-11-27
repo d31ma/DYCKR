@@ -114,3 +114,4 @@ pub mod lua_line;
 pub mod lua_shadow;
 pub mod lua_shadow_writer;
 pub mod lua_models;
+pub mod fsharp_lexer;
