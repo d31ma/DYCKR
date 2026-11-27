@@ -276,3 +276,4 @@ pub mod fsharp_task_members;
 pub mod planned_type;
 pub mod planned_method;
 pub mod schema_marker_names;
+pub mod fsharp_markers;
