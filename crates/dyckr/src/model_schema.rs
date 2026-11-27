@@ -75,6 +75,22 @@ pub struct ModelSchema;
 
 impl ModelSchema {
 
+    pub fn require_realm(path: &Path, source: &str, schema: bool) -> Result<(), crate::failure::Failure> {
+        let unsupported = ![
+            schema,
+            path.starts_with(crate::model_schema::CLIENT_MODELS),
+            !path
+                .extension()
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| crate::model_schema::CLIENT_LANGUAGES.contains(&extension)),
+        ]
+        .contains(&false);
+        unsupported
+            .then(|| crate::model_schema::client_failure(path, source))
+            .map_or(Ok(()), Err)
+    }
+
+
     pub fn lua_plain(
         view: &crate::lua_view::LuaView,
         source: &str,
