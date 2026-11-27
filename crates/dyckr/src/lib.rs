@@ -140,3 +140,4 @@ pub mod yon_marker;
 pub mod go_marker_name;
 pub mod ruby_lexer;
 pub mod lexical;
+pub mod source_mask;
