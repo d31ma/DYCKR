@@ -293,3 +293,21 @@ pub fn invocation_body(
         crate::csharp::quote(&method.name)
     ))
 }
+
+
+pub fn constructor_parameters(type_declaration: &Type, fields: &[String]) -> Result<String, String> {
+    let mut parameters = Vec::new();
+    for name in fields {
+        let Some(field) = type_declaration
+            .fields
+            .iter()
+            .find(|field| field.name == *name)
+        else {
+            return Err(format!(
+                "Required constructor field '{name}' has no explicit C# type"
+            ));
+        };
+        parameters.push(format!("{} {name}", field.type_source));
+    }
+    Ok(parameters.join(", "))
+}
