@@ -85,3 +85,4 @@ pub mod event_resource;
 pub mod event_type;
 pub mod event_timer;
 pub mod content_digest;
+pub mod html_escape;
