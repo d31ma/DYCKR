@@ -157,3 +157,6 @@ pub mod cpp_member_end;
 pub mod cpp_shape;
 pub mod cpp_step;
 pub mod cpp_declaration;
+pub mod cpp_member_reader;
+pub mod cpp_file_reader;
+pub mod cpp_file;
