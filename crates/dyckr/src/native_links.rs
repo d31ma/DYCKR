@@ -51,7 +51,6 @@ impl NativeLinks {
         (!valid).then_some(Self::PROBLEM)
     }
 
-    #[cfg(test)]
     pub fn declared(schemes: &[&str], hosts: &[&str]) -> Self {
         Self {
             schemes: schemes.iter().map(|scheme| String::from(*scheme)).collect(),
