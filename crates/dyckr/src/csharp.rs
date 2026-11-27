@@ -168,3 +168,17 @@ pub fn parameter_at<'a>(
     };
     method.parameters.get(index).ok_or(out_of_range)
 }
+
+
+pub fn pageable_line(method: &Method, policy: &Value) -> Result<String, String> {
+    let parameter = crate::csharp::parameter_at(method, policy, "Pageable")?;
+    if !crate::csharp::is_json(&parameter.type_source) {
+        return Err("C# Pageable parameters must have type BehaviorJSON".to_owned());
+    }
+    Ok(format!(
+        "{} = BehaviorPage.Normalize({}, BehaviorJSON.Parse({}));\n",
+        parameter.name,
+        parameter.name,
+        crate::csharp::quote(&crate::sorted_json::SortedJson::text(policy))
+    ))
+}
