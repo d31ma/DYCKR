@@ -60,3 +60,4 @@ pub mod probe_memory;
 pub mod topics;
 pub mod topic_table;
 pub mod routing;
+pub mod lexical_mask;
