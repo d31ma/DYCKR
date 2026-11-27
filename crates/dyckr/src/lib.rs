@@ -272,3 +272,4 @@ pub mod value_source;
 pub mod string_list;
 pub mod polyglot_unit;
 pub mod csharp_task_members;
+pub mod fsharp_task_members;
