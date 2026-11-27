@@ -5,3 +5,5 @@ pub mod unicode_name;
 pub mod portable_path;
 pub mod failure;
 pub mod node_driver;
+pub mod python_parameters;
+pub mod wasm_optimizer;
