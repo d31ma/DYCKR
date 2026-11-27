@@ -189,3 +189,5 @@ pub mod native_menu_action;
 pub mod valid_route;
 pub mod native_menu_entry;
 pub mod xml_escape;
+pub mod browser_api_permissions;
+pub mod native_links;
