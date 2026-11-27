@@ -241,3 +241,5 @@ pub mod constructor_field_policy;
 pub mod rust_collaborators;
 pub mod kotlin_member_syntax;
 pub mod csharp_model_type;
+pub mod rust_arguments;
+pub mod rust_task_member;
