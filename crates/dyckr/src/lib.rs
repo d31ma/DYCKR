@@ -174,3 +174,5 @@ pub mod storage_member;
 pub mod quoted_string_escape;
 pub mod safety;
 pub mod yon_member;
+pub mod native_outgoing_hosts;
+pub mod peers_member;
