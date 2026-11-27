@@ -194,3 +194,4 @@ pub mod native_links;
 pub mod target_floor;
 pub mod minimum_system;
 pub mod native_route_index;
+pub mod native_menu_config;
