@@ -215,3 +215,4 @@ pub mod hot_update;
 pub mod migration;
 pub mod piece;
 pub mod java_model_schema;
+pub mod companion_language;
