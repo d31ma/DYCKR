@@ -65,3 +65,5 @@ pub mod cpp_raw_text;
 pub mod framework_marker;
 pub mod renamed;
 pub mod shape;
+pub mod model;
+pub mod type_text;
