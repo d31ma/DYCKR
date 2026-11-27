@@ -96,3 +96,4 @@ pub mod gateway_limits;
 pub mod role_folders;
 pub mod class_file_name;
 pub mod declaration;
+pub mod annotation_target;
