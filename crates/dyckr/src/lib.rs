@@ -191,3 +191,4 @@ pub mod native_menu_entry;
 pub mod xml_escape;
 pub mod browser_api_permissions;
 pub mod native_links;
+pub mod target_floor;
