@@ -168,3 +168,5 @@ pub mod style_path;
 pub mod vendor_provenance;
 pub mod style_source;
 pub mod config_failure;
+pub mod blob_limits;
+pub mod browser_api_grants;
