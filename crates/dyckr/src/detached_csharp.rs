@@ -102,3 +102,34 @@ pub fn line(module: &Module, offset: usize) -> usize {
             .get(..offset)
             .map_or(0, |before| before.matches('\n').count())
     }
+pub struct DetachedCsharp {
+    pub lowered: String,
+    pub runtime: String,
+    pub setups: String,
+    pub methods: Vec<crate::planned_method::PlannedMethod>,
+    pub types: Vec<crate::planned_type::PlannedType>,
+    pub test_context: String,
+}
+
+impl DetachedCsharp {
+
+    pub fn with_lowered(self, lowered: String) -> DetachedCsharp {
+        DetachedCsharp { lowered, ..self }
+    }
+
+    pub fn plain(lowered: String) -> DetachedCsharp {
+        DetachedCsharp {
+            lowered,
+            runtime: String::new(),
+            setups: String::new(),
+            methods: Vec::new(),
+            types: Vec::new(),
+            test_context: String::new(),
+        }
+    }
+
+    pub fn without_page_storage(self) -> DetachedCsharp {
+        let setups = self.setups.replace(crate::detached_csharp_consts::PAGE_STORAGE, crate::detached_csharp_consts::NO_STORAGE);
+        DetachedCsharp { setups, ..self }
+    }
+}
