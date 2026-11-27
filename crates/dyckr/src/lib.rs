@@ -239,3 +239,4 @@ pub mod owner_name;
 pub mod companion_converters;
 pub mod constructor_field_policy;
 pub mod rust_collaborators;
+pub mod kotlin_member_syntax;
