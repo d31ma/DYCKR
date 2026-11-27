@@ -143,3 +143,5 @@ pub mod lexical;
 pub mod source_mask;
 pub mod cpp_member_kind;
 pub mod cpp_type_text;
+pub mod cpp_attribute;
+pub mod cpp_token;
