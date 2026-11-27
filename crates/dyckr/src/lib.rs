@@ -67,3 +67,4 @@ pub mod renamed;
 pub mod shape;
 pub mod model;
 pub mod type_text;
+pub mod plan;
