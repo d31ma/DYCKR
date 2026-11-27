@@ -1,3 +1,32 @@
+use serde_json::{Map, Value, json};
+
+pub struct ClientClass {
+    pub name: String,
+    pub marker: Range<usize>,
+    pub body: Range<usize>,
+    pub path: String,
+    pub adapter: String,
+    pub has_other_role: bool,
+}
+
+impl ClientClass {
+    pub fn replacement(&self, extension: &str, streams: bool) -> String {
+        if self.has_other_role {
+            return String::new();
+        }
+        let mut options = Map::new();
+        if streams {
+            options.insert(String::from("streams"), json!(true));
+        }
+        let arguments = if options.is_empty() {
+            String::new()
+        } else {
+            crate::sorted_json::SortedJson::text(&Value::Object(options))
+        };
+        crate::http_client_source::HttpClientSource::marker_text(extension, "Client", &arguments)
+    }
+}
+
 
 pub struct RequestEdit {
     pub marker: String,
