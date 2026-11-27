@@ -236,3 +236,4 @@ pub mod rust_model_type;
 pub mod declaration_names;
 pub mod declared_service;
 pub mod owner_name;
+pub mod companion_converters;
