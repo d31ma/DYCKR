@@ -79,3 +79,6 @@ pub mod web_event_models;
 pub mod web_event_sources;
 pub mod language_kinds;
 pub mod event_method;
+pub mod event_stream;
+pub mod event_listener;
+pub mod event_resource;
