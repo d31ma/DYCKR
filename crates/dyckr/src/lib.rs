@@ -141,3 +141,5 @@ pub mod go_marker_name;
 pub mod ruby_lexer;
 pub mod lexical;
 pub mod source_mask;
+pub mod cpp_member_kind;
+pub mod cpp_type_text;
