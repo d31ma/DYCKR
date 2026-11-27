@@ -1,0 +1,9 @@
+pub struct JavaBuiltins;
+
+impl JavaBuiltins {
+    pub const NONE: &'static str = "\nfinal class BehaviorBuiltins {\n    private BehaviorBuiltins() {}\n    static Behaviors.CacheAdapter cache(String name) { return null; }\n    static Behaviors.EntityAdapter entities(String name) { return null; }\n    static Object exchange(java.util.Map<String, Object> request, Behaviors.Execution execution) { throw Behaviors.fail(\"http-adapter\"); }\n}\n";
+
+    pub fn in_browser(lowered: &str, browser: &str) -> String {
+        lowered.replace(Self::NONE, &format!("\n{browser}"))
+    }
+}
