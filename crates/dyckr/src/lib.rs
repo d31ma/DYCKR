@@ -290,3 +290,4 @@ pub mod polyglot;
 pub mod stored_state;
 pub mod visible_code;
 pub mod annotation_rule;
+pub mod lua_view;
