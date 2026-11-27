@@ -101,3 +101,4 @@ pub mod native_companion;
 pub mod dotnet_model_languages;
 pub mod fsharp_syntax;
 pub mod lua_syntax;
+pub mod yard;
