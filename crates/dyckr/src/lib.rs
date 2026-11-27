@@ -282,3 +282,4 @@ pub mod fsharp_view;
 pub mod fsharp_source_consts;
 pub mod detached_csharp;
 pub mod service_roles;
+pub mod model_schema;
