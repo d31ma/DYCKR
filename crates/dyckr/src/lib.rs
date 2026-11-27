@@ -218,3 +218,5 @@ pub mod java_model_schema;
 pub mod companion_language;
 pub mod instance_name;
 pub mod native_application_lifetime;
+pub mod swift_platform;
+pub mod kotlin_builtins;
