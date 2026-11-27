@@ -230,3 +230,4 @@ pub mod companion_syntax;
 pub mod kotlin_header;
 pub mod companion_failures;
 pub mod go;
+pub mod companion_names;
