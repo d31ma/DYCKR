@@ -156,3 +156,17 @@ pub fn blocks<'a>(source: &'a str, keyword: &str) -> Vec<(&'a str, &'a str)> {
     }
     found
 }
+
+pub fn parameter_type(declaration: &str) -> &str {
+    declaration
+        .split_once(':')
+        .map_or(declaration, |(_, kind)| kind.trim())
+}
+
+pub fn swift_label(declaration: &str) -> String {
+    let names = declaration.split_once(':').map_or("", |(names, _)| names);
+    match names.split_whitespace().next() {
+        Some("_") | None => String::new(),
+        Some(label) => format!("{label}: "),
+    }
+}
