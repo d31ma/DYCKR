@@ -288,3 +288,4 @@ pub mod native_storage;
 pub mod csharp;
 pub mod polyglot;
 pub mod stored_state;
+pub mod visible_code;
