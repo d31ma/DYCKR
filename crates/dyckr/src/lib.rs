@@ -94,3 +94,4 @@ pub mod typescript_program;
 pub mod publish;
 pub mod gateway_limits;
 pub mod role_folders;
+pub mod class_file_name;
