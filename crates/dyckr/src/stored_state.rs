@@ -1,3 +1,9 @@
+pub struct SigilField {
+    pub line_start: usize,
+    pub indent: usize,
+    pub at: usize,
+    pub written: String,
+}
 pub struct StoredState;
 
 impl StoredState {
