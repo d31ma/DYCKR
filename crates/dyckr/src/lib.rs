@@ -195,3 +195,5 @@ pub mod target_floor;
 pub mod minimum_system;
 pub mod native_route_index;
 pub mod native_menu_config;
+pub mod valid_icon_source;
+pub mod native_tray;
