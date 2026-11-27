@@ -199,3 +199,59 @@ pub fn validation_prefix(method: &Method) -> Result<String, String> {
         parameter.name
     ))
 }
+
+
+pub fn gateway_body(method: &Method, policy: &Value) -> String {
+    let key = policy["key"].as_str().unwrap_or_default();
+    let mut names = Vec::new();
+    for parameter in &method.parameters {
+        names.push(parameter.name.as_str());
+    }
+    format!(
+        "\nreturn Behaviors.GatewayResult(YonGateway.Call({}, Behaviors.GatewayArguments(new BehaviorJSON[] {{ {} }})));\n",
+        crate::csharp::quote(key),
+        names.join(", ")
+    )
+}
+
+pub fn mapping_body(method: &Method, policy: &Value) -> Result<String, String> {
+    let result = policy.get("result").and_then(Value::as_str);
+    if result.is_none() && !crate::csharp::returns_json_or_task_json(method) {
+        return Err(
+            "C# mapping methods require BehaviorJSON or async Task<BehaviorJSON>".to_owned(),
+        );
+    }
+    let (argument, _) = crate::mapper::plan(policy)?;
+    let value = method
+        .parameters
+        .get(argument)
+        .ok_or("Convert reads an argument the method does not declare")?;
+    let plan = crate::csharp::quote(&crate::sorted_json::SortedJson::text(policy));
+    let Some(result) = result else {
+        return Ok(format!(
+            "\nreturn BehaviorContext.MapValue(BehaviorJSON.Parse({plan}), BehaviorJSON.From({}));\n",
+            value.name
+        ));
+    };
+    if policy["realm"] == "tac" {
+        return Ok(format!(
+            "\nreturn TacModels.Read<{result}>(Tac.ParseValue(BehaviorContext.MapValue(BehaviorJSON.Parse({plan}), BehaviorJSON.Parse(Tac.EncodeValue(TacModels.Plain({})))).ToString()));\n",
+            value.name
+        ));
+    }
+    Ok(format!(
+        "\nreturn System.Text.Json.JsonSerializer.Deserialize<{result}>(BehaviorContext.MapValue(BehaviorJSON.Parse({plan}), BehaviorJSON.Parse(System.Text.Json.JsonSerializer.Serialize({}))).ToString(), YonModels.Options)!;\n",
+        value.name
+    ))
+}
+
+pub fn query_body(method: &Method, query: &Value) -> Result<String, String> {
+    if !method.asynchronous || !crate::csharp::is_task_json(&method.return_type) {
+        return Err("C# query methods require async Task<BehaviorJSON>".to_owned());
+    }
+    let arguments = crate::csharp::json_arguments(method);
+    Ok(format!(
+        "\nreturn await this.behaviors.Query(BehaviorJSON.Parse({}), new BehaviorJSON[] {{ {arguments} }});\n",
+        crate::csharp::quote(&crate::sorted_json::SortedJson::text(query))
+    ))
+}
