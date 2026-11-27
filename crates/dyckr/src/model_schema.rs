@@ -4,6 +4,7 @@ pub const CLIENT_LANGUAGES: [&'static str; 13] = [
 pub const CLIENT_MODELS: &'static str = "client/models";
 use std::path::Path;
 use crate::failure::Failure;
+use crate::behavior_input::Input;
 
 
 pub fn client_failure(path: &Path, source: &str) -> Failure {
@@ -33,4 +34,25 @@ pub fn marker_offset(path: &Path, source: &str) -> Option<usize> {
             })
             .filter_map(|marker| code.find(&marker))
             .min()
+    }
+
+pub fn require_schema(input: &Input<'_>, markers: &[crate::behavior_marker::Marker]) -> Result<(), Failure> {
+        let refused = markers
+            .iter()
+            .find(|marker| !crate::schema_marker_names::NAMES.contains(&marker.name.as_str()));
+        refused.map_or(Ok(()), |marker| {
+            Err(crate::failure::Failure::one(crate::failure::diagnostic(
+                1310,
+                "A model carries only declarative settings and validation metadata",
+                Some(
+                    "Move behavior and role annotations into the appropriate role folder."
+                        .to_owned(),
+                ),
+                crate::failure::source_span(
+                    &input.path.to_string_lossy(),
+                    marker.span.start,
+                    marker.span.end,
+                ),
+            )))
+        })
     }
