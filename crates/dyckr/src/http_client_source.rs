@@ -138,3 +138,13 @@ impl HttpClientSource {
         format!("{first}{}", characters.as_str())
     }
 }
+impl HttpClientSource {
+    pub fn is_name(name: &str) -> bool {
+        let name = Self::normalized(name);
+        name == crate::http_client_source::CLASS
+            || name == crate::http_client_source::STREAM
+            || name == crate::http_client_source::SOCKET
+            || Self::request(&name).is_some()
+    }
+
+}
