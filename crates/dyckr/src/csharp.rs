@@ -1,4 +1,4 @@
-use crate::behavior_module::Type;
+use crate::behavior_module::{Method, Parameter, Type};
 
 
 pub fn configuration_line(type_declaration: &Type) -> String {
@@ -151,7 +151,6 @@ pub fn policy_line(type_declaration: &Type) -> String {
         crate::csharp::quote(&policies)
     )
 }
-use crate::behavior_module::{Method, Parameter};
 
 
 pub fn parameter_at<'a>(
@@ -268,4 +267,29 @@ pub fn written_body(method: &Method) -> Result<Option<String>, String> {
         return crate::csharp::mapping_body(method, policy).map(Some);
     }
     Ok(None)
+}
+
+
+pub fn validation_only_body(method: &Method, prefix: &str, body: &str) -> Result<String, String> {
+    if !crate::csharp::returns_json_or_task_json(method) {
+        return Err("C# Check methods require BehaviorJSON or async Task<BehaviorJSON>".to_owned());
+    }
+    Ok(format!("\n{prefix}{body}\n"))
+}
+
+pub fn invocation_body(
+    type_declaration: &Type,
+    method: &Method,
+    prefix: &str,
+    body: &str,
+) -> Result<String, String> {
+    if !method.asynchronous || !crate::csharp::is_task_json(&method.return_type) {
+        return Err("C# asynchronous behavior methods require async Task<BehaviorJSON>".to_owned());
+    }
+    let arguments = crate::csharp::json_arguments(method);
+    Ok(format!(
+        "\n{prefix}return await this.behaviors.Invoke({}, {}, new BehaviorJSON[] {{ {arguments} }}, async () => {{ {body} }});\n",
+        crate::csharp::quote(&type_declaration.name),
+        crate::csharp::quote(&method.name)
+    ))
 }
