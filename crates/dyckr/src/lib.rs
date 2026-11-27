@@ -231,3 +231,4 @@ pub mod kotlin_header;
 pub mod companion_failures;
 pub mod go;
 pub mod companion_names;
+pub mod kotlin_member;
