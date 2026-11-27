@@ -287,3 +287,4 @@ pub mod csharp_task_models;
 pub mod native_storage;
 pub mod csharp;
 pub mod polyglot;
+pub mod stored_state;
