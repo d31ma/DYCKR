@@ -482,3 +482,48 @@ pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) 
         crate::csharp::quote(&unit.name),
     )
 }
+
+
+pub fn lower(module: &Module, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String, test_block: &dyn Fn(&Module, &Type, &Unit) -> String, unit_helper: &dyn Fn(&Module) -> &'static str, exchange_body: &dyn Fn(&Type, &Method, &str) -> Option<String>) -> Result<String, String> {
+    let mut edits = Vec::new();
+    let mut registrations = Map::new();
+    let mut configurations = String::new();
+    let mut entities = String::new();
+    let mut policies = String::new();
+    for type_declaration in &module.types {
+        edits.extend(crate::polyglot::concrete_edit(module, type_declaration));
+        policies.push_str(&crate::csharp::policy_line(type_declaration));
+        if type_declaration.configuration {
+            configurations.push_str(&crate::csharp::configuration_line(type_declaration));
+        }
+        if let Some(entity) = &type_declaration.entity {
+            entities.push_str(&crate::csharp::entity_line(type_declaration, entity));
+        }
+        if let Some(fields) = &type_declaration.constructor {
+            edits.push(crate::csharp::constructor_edit(type_declaration, fields)?);
+        }
+        if let Some(unit) = crate::polyglot_unit::polyglot_unit(type_declaration) {
+            edits.push(Edit {
+                range: type_declaration.body.start..type_declaration.body.start,
+                replacement: test_block(module, type_declaration, &unit),
+            });
+        }
+        let methods = crate::csharp::lower_methods(module, type_declaration, &mut edits, exchange_body)?;
+        registrations.insert(
+            type_declaration.name.clone(),
+            serde_json::json!({"cache": type_declaration.cache, "methods": methods}),
+        );
+    }
+    let registry = crate::sorted_json::SortedJson::text(&Value::Object(registrations));
+    let mut generated = runtime(
+        &module.module_id,
+        &module.environment,
+        &registry,
+        &configurations,
+        &entities,
+        &policies,
+    );
+    generated.push_str(crate::csharp::CsharpErrorBody::reader(module));
+    generated.push_str(unit_helper(module));
+    crate::polyglot::render(module, edits, &generated)
+}
