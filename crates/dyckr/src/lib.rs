@@ -255,3 +255,4 @@ pub mod behavior_module;
 pub mod prepared;
 pub mod provider_qualifiers;
 pub mod kotlin_members;
+pub mod with_required_constructor;
