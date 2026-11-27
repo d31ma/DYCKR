@@ -32,7 +32,6 @@ impl NativeOutgoingHosts {
         })
     }
 
-    #[cfg(test)]
     pub fn listed(hosts: &[&str]) -> Self {
         Self {
             hosts: hosts.iter().map(|host| host.to_ascii_lowercase()).collect(),
@@ -45,7 +44,6 @@ impl NativeOutgoingHosts {
         &self.hosts
     }
 
-    #[cfg(test)]
     pub fn with_yon_origin(self, yon_origin: Option<String>) -> Self {
         Self { yon_origin, ..self }
     }
