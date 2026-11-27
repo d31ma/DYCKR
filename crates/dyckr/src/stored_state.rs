@@ -44,7 +44,6 @@ impl StoredState {
         }
     }
 }
-use std::path::Path;
 use crate::failure::{diagnostic, source_span};
 
 impl StoredState {
@@ -96,5 +95,60 @@ impl StoredState {
             )),
             source_span(&portable, at, (at + written.len()).min(source.len())),
         ))
+    }
+}
+use std::path::Path;
+
+impl StoredState {
+
+    pub fn sigil_fields(path: &Path, source: &str) -> Vec<crate::stored_state::SigilField> {
+        let language = path
+            .extension()
+            .and_then(|value| value.to_str())
+            .unwrap_or("");
+        let mut fields = Vec::new();
+        if !crate::stored_state::StoredState::SIGIL_LANGUAGES.contains(&language) || !source.contains('$') {
+            return fields;
+        }
+        let mask = crate::lexical::code_mask(language, source);
+        let code = crate::visible_code::visible_code(source, &mask.code);
+        let mut depth = 0_usize;
+        let mut in_class = false;
+        let mut offset = 0;
+        for line in code.split_inclusive('\n') {
+            let start = offset;
+            offset += line.len();
+            if depth == 1
+                && in_class
+                && let Some((at, written)) = crate::stored_state::StoredState::sigil_field(line)
+            {
+                fields.push(crate::stored_state::SigilField {
+                    line_start: start,
+                    indent: line.len() - line.trim_start().len(),
+                    at: start + at,
+                    written: written.to_owned(),
+                });
+            }
+            for byte in line.bytes() {
+                match byte {
+                    b'{' => {
+                        if depth == 0 {
+                            in_class = line.split_whitespace().any(|word| word == "class");
+                        }
+                        depth += 1;
+                    }
+                    b'}' => depth = depth.saturating_sub(1),
+                    _ => {}
+                }
+            }
+        }
+        fields
+    }
+
+    pub fn refuse_sigils(path: &Path, source: &str) -> Result<(), crate::failure::Failure> {
+        match crate::stored_state::StoredState::sigil_fields(path, source).first() {
+            Some(field) => Err(crate::stored_state::StoredState::sigil_failure(path, source, field.at, &field.written)),
+            None => Ok(()),
+        }
     }
 }
