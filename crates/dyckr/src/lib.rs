@@ -213,3 +213,5 @@ pub mod behavior_marker;
 pub mod gateway;
 pub mod hot_update;
 pub mod migration;
+pub mod piece;
+pub mod java_model_schema;
