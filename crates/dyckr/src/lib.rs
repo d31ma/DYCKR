@@ -228,3 +228,4 @@ pub mod declares_table;
 pub mod modifiers;
 pub mod companion_syntax;
 pub mod kotlin_header;
+pub mod companion_failures;
