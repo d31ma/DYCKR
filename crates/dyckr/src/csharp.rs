@@ -40,7 +40,6 @@ fn add_partition(entity: &Value, mapping: &mut Value) {
         mapping["partition"] = partition.clone();
     }
 }
-use crate::behavior_module::Method;
 
 
 pub fn json_arguments(method: &Method) -> String {
@@ -151,4 +150,21 @@ pub fn policy_line(type_declaration: &Type) -> String {
         type_declaration.name,
         crate::csharp::quote(&policies)
     )
+}
+use crate::behavior_module::{Method, Parameter};
+
+
+pub fn parameter_at<'a>(
+    method: &'a Method,
+    policy: &Value,
+    annotation_name: &str,
+) -> Result<&'a Parameter, String> {
+    let Some(position) = policy["argument"].as_u64() else {
+        return Err(format!("Missing {annotation_name} argument"));
+    };
+    let out_of_range = format!("{annotation_name} argument is out of range");
+    let Ok(index) = usize::try_from(position) else {
+        return Err(out_of_range);
+    };
+    method.parameters.get(index).ok_or(out_of_range)
 }
