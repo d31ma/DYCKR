@@ -29,3 +29,32 @@ pub fn written(kept: &[&str]) -> String {
         }
         format!("{}{}{}", OPEN, kept.join("; "), CLOSE)
     }
+
+use crate::fsharp_lexer::FsharpLexer;
+pub struct FsharpMarkers;
+
+impl FsharpMarkers {
+    pub fn strip(source: &str, find: &dyn Fn(&str) -> bool) -> String {
+        let code = FsharpLexer::code_mask(source).code;
+        Self::without_groups(source, groups(source, &code), find)
+    }
+
+    fn without_groups(source: &str, groups: Vec<Range<usize>>, find: &dyn Fn(&str) -> bool) -> String {
+        let mut stripped = source.to_owned();
+        for group in groups.into_iter().rev() {
+            let replacement = Self::kept(&source[group.clone()], find);
+            stripped.replace_range(group, &replacement);
+        }
+        stripped
+    }
+
+    fn kept(group: &str, find: &dyn Fn(&str) -> bool) -> String {
+        let inside = &group[OPEN.len()..group.len() - CLOSE.len()];
+        let kept: Vec<&str> = crate::fsharp_type::FsharpType::split_top_level(inside, ";")
+            .into_iter()
+            .filter(|item| !find(item))
+            .collect();
+        let written = written(&kept);
+        format!("{written:<width$}", width = group.len())
+    }
+}
