@@ -275,3 +275,4 @@ pub mod csharp_task_members;
 pub mod fsharp_task_members;
 pub mod planned_type;
 pub mod planned_method;
+pub mod schema_marker_names;
