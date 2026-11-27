@@ -78,3 +78,4 @@ pub mod web_event_sender;
 pub mod web_event_models;
 pub mod web_event_sources;
 pub mod language_kinds;
+pub mod event_method;
