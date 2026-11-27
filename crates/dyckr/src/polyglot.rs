@@ -44,3 +44,55 @@ pub fn declared_fields(ty: &Type, spell: impl Fn(&Field) -> String) -> String {
     }
     output
 }
+
+
+pub fn concrete_edit(module: &Module, ty: &Type) -> Option<Edit> {
+    if !ty.declared || matches!(module.language.as_str(), "rs" | "go") {
+        return None;
+    }
+    if module.language == "py" {
+        return crate::polyglot::python_protocol_edit(module, ty);
+    }
+    let replacement = match module.language.as_str() {
+        "swift" => "final class",
+        "dart" => "class",
+        language => crate::polyglot::concrete(language),
+    };
+    Some(Edit {
+        range: ty.keyword.clone(),
+        replacement: replacement.to_owned(),
+    })
+}
+
+pub fn python_protocol_edit(module: &Module, ty: &Type) -> Option<Edit> {
+    let header = &module.source[ty.keyword.end..ty.body.start];
+    let open = ty.keyword.end + header.find('(')?;
+    let close = ty.keyword.end + header.rfind(')')?;
+    let mut bases = Vec::new();
+    for base in module.source[open + 1..close].split(',') {
+        let base = base.trim();
+        if !base.is_empty() && !crate::polyglot::is_protocol_base(base) {
+            bases.push(base);
+        }
+    }
+    let replacement = if bases.is_empty() {
+        String::new()
+    } else {
+        format!("({})", bases.join(", "))
+    };
+    Some(Edit {
+        range: open..close + 1,
+        replacement,
+    })
+}
+
+pub fn is_protocol_base(base: &str) -> bool {
+    matches!(base, "Protocol" | "typing.Protocol")
+}
+
+pub fn concrete(language: &str) -> &'static str {
+    match language {
+        "rs" => "struct",
+        _ => "class",
+    }
+}
