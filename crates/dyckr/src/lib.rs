@@ -63,3 +63,4 @@ pub mod routing;
 pub mod lexical_mask;
 pub mod cpp_raw_text;
 pub mod framework_marker;
+pub mod renamed;
