@@ -623,7 +623,6 @@ struct ManifestApplication {
 }
 
 impl NativeApplication {
-    #[cfg(test)]
     pub fn discover(project_root: &Path) -> Result<Self, Failure> {
         Self::discover_from_snapshot(project_root, project_root)
     }
