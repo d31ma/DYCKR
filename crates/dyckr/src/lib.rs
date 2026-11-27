@@ -165,3 +165,4 @@ pub mod declarations;
 pub mod route_types;
 pub mod go_source;
 pub mod style_path;
+pub mod vendor_provenance;
