@@ -1,4 +1,6 @@
 use crate::behavior_module::{Method, Module, Type};
+use crate::planned_method::PlannedMethod;
+use crate::polyglot_unit::polyglot_unit;
 use crate::planned_type::PlannedType;
 use crate::sorted_json::SortedJson;
 use serde_json::{Map, Value};
@@ -131,5 +133,73 @@ impl DetachedCsharp {
     pub fn without_page_storage(self) -> DetachedCsharp {
         let setups = self.setups.replace(crate::detached_csharp_consts::PAGE_STORAGE, crate::detached_csharp_consts::NO_STORAGE);
         DetachedCsharp { setups, ..self }
+    }
+}
+impl crate::detached_csharp::DetachedCsharp {
+
+    pub fn test_context(module: &Module) -> String {
+        module
+            .types
+            .iter()
+            .find_map(polyglot_unit)
+            .map(|unit| crate::csharp::test_context(&unit))
+            .unwrap_or_default()
+    }
+
+    pub fn entities(module: &Module) -> String {
+        module.types.iter().filter_map(Self::entity_line).collect()
+    }
+
+    pub fn entity_line(type_declaration: &Type) -> Option<String> {
+        let entity = type_declaration.entity.as_ref()?;
+        let mapping = crate::csharp::entity_mapping(type_declaration, entity);
+        Some(crate::detached_csharp::named_line("entity", &type_declaration.name, &mapping))
+    }
+
+    pub fn setups(module: &Module) -> String {
+        let lines: String = module
+            .types
+            .iter()
+            .filter(|type_declaration| type_declaration.configuration)
+            .map(crate::csharp::configuration_line)
+            .collect();
+        let storage = crate::detached_csharp::storage(module);
+        format!(
+            "static class BehaviorSetups {{\n    \
+             [System.Runtime.CompilerServices.ModuleInitializer]\n    \
+             internal static void Register() {{ Behaviors.Configurations = Configure;{storage} }}\n    \
+             static BehaviorAdapters Configure(System.Type configuration, BehaviorExecution execution) {{\n{lines}return null;\n    }}\n}}\n"
+        )
+    }
+
+    pub fn methods(module: &Module) -> Vec<PlannedMethod> {
+        module
+            .types
+            .iter()
+            .flat_map(|type_declaration| {
+                type_declaration
+                    .methods
+                    .iter()
+                    .filter(|method| !method.metadata.is_empty())
+                    .map(move |method| Self::planned_method(module, type_declaration, method))
+            })
+            .collect()
+    }
+
+    pub fn planned_method(module: &Module, type_declaration: &Type, method: &Method) -> PlannedMethod {
+        PlannedMethod {
+            owner: type_declaration.name.clone(),
+            name: method.name.clone(),
+            line: crate::detached_csharp::line(module, method.signature.start),
+            parameters: method
+                .parameters
+                .iter()
+                .map(|parameter| parameter.name.clone())
+                .collect(),
+            metadata: method.metadata.clone(),
+            declared: method.declared,
+            asynchronous: method.asynchronous,
+            mapped_argument: crate::detached_csharp::mapped_argument(method),
+        }
     }
 }
