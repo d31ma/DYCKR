@@ -1,0 +1,31 @@
+{
+  "contract_version": 1,
+  "routes": [
+    {
+      "route": "/products",
+      "kind": "api",
+      "methods": [
+        "GET"
+      ],
+      "view": null,
+      "handlers": [
+        {
+          "source": "server/routes/products/yon.ts",
+          "language": "typescript",
+          "runtime": "javascript.v1"
+        },
+        {
+          "source": "server/routes/products/yon.py",
+          "language": "python",
+          "runtime": "python.v1"
+        }
+      ],
+      "context": {
+        "collision_policy": "error",
+        "static_exports": [],
+        "response_exports": []
+      },
+      "parameters": []
+    }
+  ]
+}
