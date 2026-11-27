@@ -262,3 +262,4 @@ pub mod behavior_scope;
 pub mod module_failure;
 pub mod safe_path;
 pub mod csharp_task_answer;
+pub mod csharp_task_shape;
