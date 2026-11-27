@@ -113,3 +113,46 @@ pub fn after_keyword(rest: &str) -> Option<&str> {
     }
     Some(rest.trim_start())
 }
+
+pub fn block_named<'a>(
+    source: &'a str,
+    keyword: &str,
+    wanted: Option<&str>,
+) -> Option<(String, &'a str)> {
+    for (header, body) in blocks(source, keyword) {
+        let name = crate::unicode_name::UnicodeName::leading(header.trim());
+        let Some(wanted) = wanted else {
+            return Some((name, body));
+        };
+        if name == wanted {
+            return Some((name, body));
+        }
+    }
+    None
+}
+
+pub fn blocks<'a>(source: &'a str, keyword: &str) -> Vec<(&'a str, &'a str)> {
+    let mut found = Vec::new();
+    let mut offset = 0usize;
+    for line in source.split_inclusive('\n') {
+        let line_start = offset;
+        offset += line.len();
+        let Some(after) = after_declaration_keyword(line, keyword) else {
+            continue;
+        };
+        let header_end = after.find(['{', ';', '\n']).unwrap_or(after.len());
+        let header = &after[..header_end];
+        let tail = &source[line_start..];
+        let Some(brace) = tail.find('{') else {
+            break;
+        };
+        if tail[..brace].contains(';') {
+            found.push((header, ""));
+            continue;
+        }
+        if let Some(body) = braced_body(source, line_start + brace) {
+            found.push((header, body));
+        }
+    }
+    found
+}
