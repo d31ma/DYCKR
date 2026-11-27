@@ -86,3 +86,7 @@ pub mod event_type;
 pub mod event_timer;
 pub mod content_digest;
 pub mod html_escape;
+pub mod content_security_policy;
+pub mod speculation_rules;
+pub mod view_transition_guard;
+pub mod base64;

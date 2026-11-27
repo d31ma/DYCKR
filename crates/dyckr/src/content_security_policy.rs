@@ -1,0 +1,145 @@
+use crate::speculation_rules::SpeculationRules;
+use crate::view_transition_guard::ViewTransitionGuard;
+use sha2::{Digest, Sha256};
+
+pub struct ContentSecurityPolicy;
+
+impl ContentSecurityPolicy {
+    const SCRIPT_SOURCES: &'static str = "'self' 'wasm-unsafe-eval'";
+    const SELF_SOURCE: &'static str = "'self'";
+    const NATIVE_BOOTSTRAP: &'static str = "default-src 'none'; script-src 'unsafe-inline'; \
+         base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
+    pub fn server(connect_sources: &str) -> String {
+        format!(
+            "default-src 'self'; connect-src 'self' {connect_sources}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; \
+             media-src 'self' blob:; script-src {}; object-src 'none'; \
+             base-uri 'none'; frame-ancestors 'none'",
+            Self::script_sources()
+        )
+    }
+
+    pub fn native_host(connect_sources: &str) -> String {
+        Self::native_host_allowing(connect_sources, "")
+    }
+
+    pub fn native_host_with_inline_script(connect_sources: &str, script: &str) -> String {
+        let script_hash = format!(" {}", Self::inline_script_hash(script));
+        Self::native_host_allowing(connect_sources, &script_hash)
+    }
+
+    pub fn native_bootstrap() -> &'static str {
+        Self::NATIVE_BOOTSTRAP
+    }
+
+    pub fn native_host_allowing(connect_sources: &str, extra_scripts: &str) -> String {
+        format!(
+            "default-src 'self'; script-src {}{extra_scripts}; style-src 'self' 'unsafe-inline'; \
+             img-src 'self' data: blob: https:; media-src 'self' blob:; font-src 'self' data: https:; connect-src {}; \
+             frame-src 'self'; form-action 'self'; object-src 'none'; base-uri 'self'",
+            Self::script_sources(),
+            Self::connect_list(connect_sources)
+        )
+    }
+
+    pub fn connect_list(connect_sources: &str) -> String {
+        [Self::SELF_SOURCE, connect_sources]
+            .into_iter()
+            .filter(|source| !source.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
+    pub fn inline_script_hash(script: &str) -> String {
+        let digest = Sha256::digest(script.as_bytes());
+        format!("'sha256-{}'", crate::base64::base64(&digest))
+    }
+
+    pub fn script_sources() -> String {
+        format!(
+            "{} {} {}",
+            Self::SCRIPT_SOURCES,
+            SpeculationRules::script_source(),
+            ViewTransitionGuard::script_source()
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::content_security_policy::ContentSecurityPolicy;
+    use crate::speculation_rules::SpeculationRules;
+use crate::view_transition_guard::ViewTransitionGuard;
+
+    #[test]
+    pub fn the_server_and_the_native_hosts_allow_the_same_scripts() {
+        let scripts = format!(
+            "script-src 'self' 'wasm-unsafe-eval' {} {};",
+            SpeculationRules::script_source(),
+            ViewTransitionGuard::script_source()
+        );
+        let server = ContentSecurityPolicy::server("https://api.example.com");
+        let native = ContentSecurityPolicy::native_host("");
+        assert!(server.contains(&scripts), "{server}");
+        assert!(native.contains(&scripts), "{native}");
+        assert!(
+            server.contains("connect-src 'self' https://api.example.com;"),
+            "{server}"
+        );
+        assert!(!native.contains('"'), "{native}");
+    }
+
+    #[test]
+    pub fn the_native_hosts_connect_only_to_the_declared_hosts() {
+        let closed = ContentSecurityPolicy::native_host("");
+        assert!(closed.contains("connect-src 'self';"), "{closed}");
+        assert!(!closed.contains("connect-src 'self' https:;"), "{closed}");
+        let listed = ContentSecurityPolicy::native_host("https://api.example.com");
+        assert!(
+            listed.contains("connect-src 'self' https://api.example.com;"),
+            "{listed}"
+        );
+    }
+
+    #[test]
+    pub fn pages_show_blob_urls_in_images_and_media() {
+        let server = ContentSecurityPolicy::server("");
+        let native = ContentSecurityPolicy::native_host("");
+        assert!(server.contains("img-src 'self' data: blob:;"), "{server}");
+        assert!(server.contains("media-src 'self' blob:;"), "{server}");
+        assert!(
+            native.contains("img-src 'self' data: blob: https:;"),
+            "{native}"
+        );
+        assert!(native.contains("media-src 'self' blob:;"), "{native}");
+        assert!(!server.contains("connect-src 'self' blob:"), "{server}");
+    }
+
+    #[test]
+    pub fn native_pages_frame_their_own_documents_like_web_pages() {
+        let native = ContentSecurityPolicy::native_host("");
+        assert!(native.contains("frame-src 'self';"), "{native}");
+        assert!(native.contains("object-src 'none';"), "{native}");
+    }
+
+    #[test]
+    pub fn native_pages_post_forms_only_to_their_own_bundle() {
+        let native = ContentSecurityPolicy::native_host("https://api.example.com");
+        assert!(native.contains("form-action 'self';"), "{native}");
+        assert!(!native.contains("form-action 'self' https:"), "{native}");
+    }
+
+    #[test]
+    pub fn a_native_host_that_writes_a_script_into_documents_allows_only_that_script() {
+        let script = "globalThis.ready = true;";
+        let policy = ContentSecurityPolicy::native_host_with_inline_script("", script);
+        let hash = ContentSecurityPolicy::inline_script_hash(script);
+        assert!(policy.contains(&format!(" {hash}; style-src")), "{policy}");
+        let scripts = policy
+            .split(';')
+            .find(|rule| rule.trim_start().starts_with("script-src"))
+            .unwrap_or_default();
+        assert!(!scripts.contains("'unsafe-inline'"), "{policy}");
+        assert!(!ContentSecurityPolicy::native_bootstrap().contains('"'));
+    }
+}
