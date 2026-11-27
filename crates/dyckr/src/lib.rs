@@ -265,3 +265,4 @@ pub mod csharp_task_answer;
 pub mod csharp_task_shape;
 pub mod csharp_task_result;
 pub mod model_mapping;
+pub mod mapper;
