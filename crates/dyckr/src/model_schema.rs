@@ -71,3 +71,27 @@ use std::path::Path;
             None => Err("Model schema metadata was not consumed".to_owned()),
         }
     }
+pub struct ModelSchema;
+
+impl ModelSchema {
+
+    pub fn lua_plain(
+        view: &crate::lua_view::LuaView,
+        source: &str,
+        native_plain: &dyn Fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>,
+    ) -> Result<Option<String>, crate::failure::Failure> {
+        let plain =
+            native_plain(view.path(), view.text()).map_err(|error| view.failure(&error))?;
+        Ok(plain.map(|_| source.to_owned()))
+    }
+
+    pub fn fsharp_plain(
+        view: &crate::fsharp_view::FsharpView,
+        source: &str,
+        native_plain: &dyn Fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>,
+    ) -> Result<Option<String>, crate::failure::Failure> {
+        let plain =
+            native_plain(view.path(), view.text()).map_err(|error| view.failure(&error))?;
+        Ok(plain.map(|_| crate::fsharp_markers::FsharpMarkers::strip(source, &|name| crate::annotation_rule::AnnotationRules::find(name).is_some())))
+    }
+}
