@@ -16,8 +16,11 @@ mod tests {
 
     #[test]
     fn tachyon_attributes_are_blanked_and_others_stay() {
-        let source = "[<TacSomething>] let x = 1 [<Other>] let y = 2";
+        let source = "[<Service>]\ntype A() =\n    [<GetRoute; Obsolete>]\n    member this.Get([<FromBody>] order: Order) = \"[<Service>]\"\n";
         let stripped = FsharpMarkers::strip(source);
-        assert_eq!(stripped, "[<           >] let x = 1 [<     >] let y = 2");
+        assert_eq!(
+            stripped,
+            "           \ntype A() =\n    [<Obsolete>]          \n    member this.Get(             order: Order) = \"[<Service>]\"\n"
+        );
     }
 }

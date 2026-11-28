@@ -52,7 +52,7 @@ impl FsharpMarkers {
         let inside = &group[OPEN.len()..group.len() - CLOSE.len()];
         let kept: Vec<&str> = crate::fsharp_type::FsharpType::split_top_level(inside, ";")
             .into_iter()
-            .filter(|item| !find(item))
+            .filter(|item| !find(is_tachyon_name(item)))
             .collect();
         let written = written(&kept);
         format!("{written:<width$}", width = group.len())
