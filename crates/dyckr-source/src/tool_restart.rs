@@ -19,6 +19,7 @@ pub struct ToolRestart {
 struct ToolRestartState {
     executable: PathBuf,
     check_arguments: Vec<OsString>,
+    version: String,
     handled_build: Mutex<String>,
     refused: AtomicBool,
     requested: CancellationToken,
@@ -39,12 +40,13 @@ impl ToolRestart {
     pub const RESTART_MESSAGE: &str = "Tachyon was updated on disk. Restarting the preview…";
 
     #[must_use]
-    pub fn watch(executable: PathBuf, check_arguments: Vec<OsString>) -> Self {
-        let started_build = ToolBuild::id(Some(&executable));
+    pub fn watch(executable: PathBuf, check_arguments: Vec<OsString>, version: &str) -> Self {
+        let started_build = ToolBuild::id(version, Some(&executable));
         Self {
             state: Arc::new(ToolRestartState {
                 executable,
                 check_arguments,
+                version: String::from(version),
                 handled_build: Mutex::new(started_build),
                 refused: AtomicBool::new(false),
                 requested: CancellationToken::new(),
@@ -112,7 +114,7 @@ impl ToolRestart {
     }
 
     fn changed_build(&self) -> Option<String> {
-        let current_build = ToolBuild::id(Some(&self.state.executable));
+        let current_build = ToolBuild::id(&self.state.version, Some(&self.state.executable));
         (current_build != *self.handled_build()).then_some(current_build)
     }
 
@@ -206,7 +208,7 @@ mod tests {
         let directory = tempfile::tempdir().expect("directory");
         let executable = directory.path().join("ty");
         fs::write(&executable, "first").expect("executable");
-        let restart = ToolRestart::watch(executable, vec![OsString::from("--version")]);
+        let restart = ToolRestart::watch(executable, vec![OsString::from("--version")], "test");
         assert_eq!(restart.check(false).await, ToolUpdate::Unchanged);
         assert!(!restart.is_requested());
     }
@@ -216,7 +218,11 @@ mod tests {
         let directory = tempfile::tempdir().expect("directory");
         let executable = directory.path().join("ty");
         fs::write(&executable, "first").expect("executable");
-        let restart = ToolRestart::watch(executable.clone(), vec![OsString::from("--version")]);
+        let restart = ToolRestart::watch(
+            executable.clone(),
+            vec![OsString::from("--version")],
+            "test",
+        );
         fs::write(&executable, "second version").expect("new executable");
         let refused = restart.check(false).await;
         assert!(
@@ -237,7 +243,11 @@ mod tests {
         let executable = directory.path().join("ty");
         fs::write(&executable, "#!/bin/sh\nexit 0\n").expect("executable");
         fs::set_permissions(&executable, fs::Permissions::from_mode(0o755)).expect("mode");
-        let restart = ToolRestart::watch(executable.clone(), vec![OsString::from("--version")]);
+        let restart = ToolRestart::watch(
+            executable.clone(),
+            vec![OsString::from("--version")],
+            "test",
+        );
         fs::write(&executable, "#!/bin/sh\necho updated\nexit 0\n").expect("new executable");
         let update = restart.check(false).await;
         assert_eq!(update, ToolUpdate::Restart);
@@ -260,7 +270,7 @@ mod tests {
         fs::write(&executable, "#!/bin/sh\nexit 0\n").expect("executable");
         fs::set_permissions(&executable, fs::Permissions::from_mode(0o755)).expect("mode");
         let check = vec![OsString::from("--check-project"), broken.clone().into()];
-        let restart = ToolRestart::watch(executable.clone(), check);
+        let restart = ToolRestart::watch(executable.clone(), check, "test");
         fs::write(&broken, "").expect("broken project");
         fs::write(
             &executable,
