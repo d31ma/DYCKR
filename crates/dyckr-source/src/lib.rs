@@ -1,6 +1,7 @@
 pub mod annotation_layout;
 pub mod annotation_modules;
 pub mod annotation_rules;
+pub mod application;
 pub mod behavior;
 pub mod convention;
 pub mod declared_contract;
