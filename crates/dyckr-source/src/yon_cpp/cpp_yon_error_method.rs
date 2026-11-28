@@ -1,0 +1,100 @@
+use super::{CppYonController, CppYonParameter, CppYonStatus};
+use crate::Failure;
+use crate::tac_cpp::{CppFailure, CppMember, CppMemberKind, CppTypeText};
+use crate::yon::built_in_error::BuiltInError;
+use dyckr::plan::ErrorResponse;
+use std::path::{Path, PathBuf};
+
+pub struct CppYonErrorMethod {
+    pub owner: String,
+    pub method: String,
+    pub error_type: String,
+    pub takes_request: bool,
+    pub status: u16,
+    pub returns: String,
+    pub path: PathBuf,
+    pub at: usize,
+}
+
+impl CppYonErrorMethod {
+    const MARKER: &'static str = "HandlesError";
+    const DEFAULT_STATUS: u16 = 500;
+    const BUILT_IN_NAMESPACE: &'static str = "tachyon::";
+    const ERROR_STATUSES: std::ops::RangeInclusive<u16> = 400..=599;
+    const STATUS: &'static str = "[[ResponseStatus]] on a [[HandlesError]] method takes an error status from 400 to 599, for example [[ResponseStatus(404)]]";
+    const SHAPE: &'static str = "A [[HandlesError]] method is an instance method that takes the error and, optionally, the request: `Problem missing(const OrderNotFound& error)` or `Problem missing(const OrderNotFound& error, const tachyon::http::HttpRequestMessage& request)`. The type of its first parameter is the error that it handles";
+    const RETURNS: &'static str =
+        "A [[HandlesError]] method returns a model or a tachyon::http::HttpResponseMessage";
+
+    pub fn all(path: &Path, owner: &str, members: &[CppMember]) -> Result<Vec<Self>, Failure> {
+        members
+            .iter()
+            .filter(|member| member.marked(Self::MARKER))
+            .map(|member| Self::read(path, owner, member))
+            .collect()
+    }
+
+    pub fn response(&self) -> ErrorResponse {
+        ErrorResponse {
+            error_type: self.error_type.clone(),
+            status: self.status,
+            returns: self.returns.clone(),
+            documentation: String::new(),
+            return_shape: dyckr::shape::Shape::Any,
+        }
+    }
+
+    fn built_in(error_type: &str) -> Option<BuiltInError> {
+        let bare = error_type
+            .strip_prefix(Self::BUILT_IN_NAMESPACE)
+            .unwrap_or(error_type);
+        BuiltInError::named(bare).filter(|found| found.name() == bare)
+    }
+
+    fn status(built_in: Option<BuiltInError>, written: Option<u16>) -> Result<u16, String> {
+        match (built_in, written) {
+            (Some(found), Some(_)) => Err(format!(
+                "{} is a built-in error and always answers {}. Remove [[ResponseStatus]] from this [[HandlesError]] method",
+                found.name(),
+                found.status()
+            )),
+            (Some(found), None) => Ok(found.status()),
+            (None, written) => Ok(written.unwrap_or(Self::DEFAULT_STATUS)),
+        }
+    }
+
+    fn read(path: &Path, owner: &str, member: &CppMember) -> Result<Self, Failure> {
+        let failure = |message: &str| {
+            CppFailure::coded(CppYonController::CODE, path, member.name_at, message)
+        };
+        let shaped = [
+            member.is_instance(CppMemberKind::Method),
+            (1..=2).contains(&member.parameters.len()),
+            member
+                .parameters
+                .get(1)
+                .is_none_or(|request| CppYonParameter::is_request(&request.type_text)),
+        ] == [true, true, true];
+        shaped.then_some(()).ok_or_else(|| failure(Self::SHAPE))?;
+        let returns = member.plain_type();
+        (returns != "void")
+            .then_some(())
+            .ok_or_else(|| failure(Self::RETURNS))?;
+        let status = CppYonStatus::read(path, member, Self::ERROR_STATUSES, Self::STATUS)?;
+        let error_type = CppTypeText::plain(&member.parameters[0].type_text)
+            .trim_start_matches("::")
+            .to_owned();
+        let built_in = Self::built_in(&error_type);
+        let status = Self::status(built_in, status).map_err(|message| failure(&message))?;
+        Ok(Self {
+            owner: owner.to_owned(),
+            method: member.name.clone(),
+            error_type: built_in.map_or(error_type, |found| found.name().to_owned()),
+            takes_request: member.parameters.len() == 2,
+            status,
+            returns,
+            path: path.to_path_buf(),
+            at: member.name_at,
+        })
+    }
+}

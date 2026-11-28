@@ -1,0 +1,25 @@
+use super::{Method, Type};
+use dyckr::sorted_json::SortedJson;
+
+pub(super) struct CsharpModelExchange;
+
+impl CsharpModelExchange {
+    pub(super) fn body(declared: &Type, method: &Method, prefix: &str) -> Option<String> {
+        Self::model_body(declared, method, prefix)
+    }
+
+    fn model_body(declared: &Type, method: &Method, prefix: &str) -> Option<String> {
+        let model = method.metadata.get("tacModelResult")?;
+        let reader = model.get("reader")?.as_str()?;
+        let suffix = model.get("suffix")?.as_str()?;
+        let models = SortedJson::text(model.get("models")?);
+        let arguments = dyckr::csharp::json_arguments(method);
+        Some(format!(
+            "\n{prefix}var __tacAnswer = await this.behaviors.Invoke({}, {}, new BehaviorJSON[] {{ {arguments} }}, () => System.Threading.Tasks.Task.FromResult(BehaviorJSON.Parse(\"null\")));\ntry {{ return TacModels.{reader}(__tacAnswer.ToString(), {}, {}){suffix}; }}\ncatch {{ throw new BehaviorError(\"HTTP_RESPONSE\"); }}\n",
+            serde_json::json!(declared.name),
+            serde_json::json!(method.name),
+            model.get("shape")?,
+            serde_json::json!(models)
+        ))
+    }
+}

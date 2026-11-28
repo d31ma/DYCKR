@@ -1,0 +1,74 @@
+use super::CppYonErrorTypes;
+use crate::Failure;
+use crate::tac_cpp::{CppClass, CppFailure, CppFile, CppLowering, CppMarkerCheck};
+use crate::yon::built_in_error::BuiltInError;
+use std::path::{Path, PathBuf};
+
+pub struct CppYonErrorType {
+    pub name: String,
+    pub path: PathBuf,
+    pub at: usize,
+    pub bases: Vec<String>,
+    pub lowered: String,
+}
+
+impl CppYonErrorType {
+    const FOLDER: &'static str = "server/errors";
+    const BASE_WORDS: [&'static str; 4] = ["public", "protected", "private", "virtual"];
+    const PLACE: &'static str = "A C++ error type is one class directly in server/errors, named after its file, for example `class OrderNotFound : public std::runtime_error { public: using std::runtime_error::runtime_error; };`";
+    const PLAIN: &'static str = "A C++ error type is a plain class without Tachyon markers. Put [[ErrorHandler]] on its handler in server/controllers";
+
+    pub fn read(path: &Path, source: &str) -> Result<Self, Failure> {
+        let file = CppFile::read(path, source)?;
+        let class = &file.class;
+        let named = path
+            .file_stem()
+            .is_some_and(|stem| stem == class.name.as_str());
+        let placed = [path.parent() == Some(Path::new(Self::FOLDER)), named] == [true, true];
+        let plain = class
+            .every_marker()
+            .iter()
+            .all(|marker| CppMarkerCheck::is_standard(&marker.name));
+        let bases = Self::bases(source, class);
+        let free = !BuiltInError::is_reserved(&class.name);
+        let problem = [
+            (placed, Self::PLACE),
+            (free, BuiltInError::APP_NAME_REFUSED),
+            (plain, Self::PLAIN),
+            (!bases.is_empty(), CppYonErrorTypes::DERIVED),
+        ]
+        .into_iter()
+        .find(|(passed, _)| !passed);
+        problem.map_or(Ok(()), |(_, message)| {
+            Err(CppFailure::unreadable(path, class.name_at, message))
+        })?;
+        Ok(Self {
+            name: class.name.clone(),
+            path: path.to_path_buf(),
+            at: class.name_at,
+            bases,
+            lowered: CppLowering::model(&file, source),
+        })
+    }
+
+    fn bases(source: &str, class: &CppClass) -> Vec<String> {
+        let start = class.name_at + class.name.len();
+        let between = source.get(start..class.body.start).unwrap_or_default();
+        let listed = between.trim().trim_start_matches("final").trim();
+        listed
+            .strip_prefix(':')
+            .unwrap_or_default()
+            .split(',')
+            .map(Self::base_name)
+            .filter(|name| !name.is_empty())
+            .collect()
+    }
+
+    fn base_name(written: &str) -> String {
+        let words: Vec<&str> = written
+            .split_whitespace()
+            .filter(|word| !Self::BASE_WORDS.contains(word))
+            .collect();
+        words.join(" ").trim_start_matches("::").to_owned()
+    }
+}

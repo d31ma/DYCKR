@@ -1,0 +1,25 @@
+[package]
+name = "tachyon-duplication"
+description = "Finds repeated blocks of code the way SonarQube's copy-paste detection does"
+version = "0.0.0-phase4"
+edition = "2024"
+rust-version = "1.97.1"
+authors = ["Tachyon Contributors"]
+license = "MIT"
+publish = false
+
+[dependencies]
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+dbg_macro = "deny"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+unwrap_used = "deny"
