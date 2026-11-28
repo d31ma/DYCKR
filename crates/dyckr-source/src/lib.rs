@@ -23,6 +23,8 @@ pub mod script_vendors;
 pub mod shared_runtimes;
 pub mod sibling_folder;
 pub mod tac_cpp;
+pub mod tool_build;
+pub mod tool_restart;
 pub mod topic_checks;
 pub mod yon;
 pub mod yon_cpp;
