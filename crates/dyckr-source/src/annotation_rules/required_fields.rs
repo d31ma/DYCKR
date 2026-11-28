@@ -459,6 +459,9 @@ impl RequiredFields {
     }
 
     pub fn class_body<'a>(code: &'a str, class: &str) -> Option<(usize, &'a str)> {
+        if class.is_empty() {
+            return None;
+        }
         let mut search = 0;
         while let Some(found) = code[search..].find(class) {
             let at = search + found;
@@ -643,6 +646,35 @@ mod tests {
     use super::RequiredFields;
     use std::collections::BTreeSet;
     use std::path::Path;
+    use std::sync::mpsc;
+    use std::thread;
+    use std::time::Duration;
+
+    #[allow(clippy::expect_used)]
+    fn within_five_seconds<T: Send + 'static>(work: impl FnOnce() -> T + Send + 'static) -> T {
+        let (sender, receiver) = mpsc::channel();
+        thread::spawn(move || sender.send(work()));
+        receiver
+            .recv_timeout(Duration::from_secs(5))
+            .expect("the work finished within five seconds")
+    }
+
+    #[test]
+    fn an_empty_class_name_finds_no_class_and_returns_at_once() {
+        let body = within_five_seconds(|| {
+            RequiredFields::class_body("public class Probe { public int Count; }", "")
+                .map(|(at, body)| (at, body.to_owned()))
+        });
+        assert_eq!(body, None);
+        let fields = within_five_seconds(|| {
+            RequiredFields::constructed(
+                Path::new("client/services/Probe.swift"),
+                "final class Probe { let count: Int }\n",
+                "",
+            )
+        });
+        assert_eq!(fields, Vec::<(String, String)>::new());
+    }
 
     fn props(file: &str, source: &str, class: &str) -> Vec<String> {
         let injectable = BTreeSet::from([String::from("TallyService"), String::from("tally")]);
