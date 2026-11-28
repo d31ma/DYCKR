@@ -99,8 +99,8 @@ fn top_level_comma(text: &str) -> Option<usize> {
 mod tests {
     #[test]
     fn rejects_nested_duplicate_policy_keys() {
-        assert!(dyckr::behavior_literal::parse(r#"{"fields":{"port":{"type":"integer","type":"string"}}}"#).is_err());
-        assert!(dyckr::behavior_literal::parse(r#"{"values":[null,true,1,-1,1.5,"text"]}"#).is_ok());
+        assert!(crate::behavior_literal::parse(r#"{"fields":{"port":{"type":"integer","type":"string"}}}"#).is_err());
+        assert!(crate::behavior_literal::parse(r#"{"values":[null,true,1,-1,1.5,"text"]}"#).is_ok());
     }
 
     #[test]
@@ -117,14 +117,14 @@ mod tests {
         ];
         for (extension, text) in written {
             assert_eq!(
-                dyckr::identifier::class_reference(extension, text),
+                crate::identifier::class_reference(extension, text),
                 Some("Order"),
                 "{extension} {text}"
             );
         }
         for (extension, text) in [("js", "\"Order\""), ("ts", "Order.class"), ("py", "{}")] {
             assert_eq!(
-                dyckr::identifier::class_reference(extension, text),
+                crate::identifier::class_reference(extension, text),
                 None,
                 "{extension} {text}"
             );
@@ -133,11 +133,11 @@ mod tests {
 
     #[test]
     fn options_start_after_the_first_top_level_comma() {
-        assert_eq!(dyckr::behavior_literal::reference_and_options(" Order "), ("Order", None));
+        assert_eq!(crate::behavior_literal::reference_and_options(" Order "), ("Order", None));
         assert_eq!(
-            dyckr::behavior_literal::reference_and_options("typeof(Order), {\"a\":[1,2],\"b\":\"x,y\"}"),
+            crate::behavior_literal::reference_and_options("typeof(Order), {\"a\":[1,2],\"b\":\"x,y\"}"),
             ("typeof(Order)", Some("{\"a\":[1,2],\"b\":\"x,y\"}"))
         );
-        assert_eq!(dyckr::behavior_literal::reference_and_options("Order,"), ("Order", Some("")));
+        assert_eq!(crate::behavior_literal::reference_and_options("Order,"), ("Order", Some("")));
     }
 }

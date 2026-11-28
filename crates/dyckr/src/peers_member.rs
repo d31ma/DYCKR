@@ -165,7 +165,7 @@ mod tests {
         serde_json::json!({"hosts": ["turn.example.com", "stun.example.com"]})
     }
 
-    fn checked(servers: &[&str], relay_only: bool) -> Result<PeersMember, crate::Failure> {
+    fn checked(servers: &[&str], relay_only: bool) -> Result<PeersMember, crate::failure::Failure> {
         PeersMember::checked(
             Some(member(servers, relay_only)),
             &granted(),

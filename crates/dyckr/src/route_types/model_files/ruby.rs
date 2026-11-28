@@ -269,7 +269,7 @@ impl RubyModels {
 
 #[cfg(test)]
 mod tests {
-    use crate::route_types::model_files::RubyModels;
+    use crate::route_types::model_files::ruby::RubyModels;
     use crate::route_types::{Model};
 use crate::shape::Shape;
 

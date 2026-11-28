@@ -305,7 +305,7 @@ impl MemberHeader {
 #[cfg(test)]
 mod tests {
     use super::MemberHeader;
-    use crate::fsharp_source::TypeForm;
+    use crate::fsharp_type_form::TypeForm;
 
     fn member(line: &str) -> (String, String) {
         let header = MemberHeader::member(line, &vec![true; line.len()]);

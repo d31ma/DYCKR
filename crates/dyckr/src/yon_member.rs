@@ -175,7 +175,7 @@ mod tests {
 
     use super::YonMember;
 
-    fn checked(origin: &str) -> Result<(), crate::Failure> {
+    fn checked(origin: &str) -> Result<(), crate::failure::Failure> {
         YonMember {
             origin: Some(String::from(origin)),
             origins: std::collections::BTreeMap::new(),
@@ -227,7 +227,7 @@ mod tests {
         );
     }
 
-    fn named(origins: &str, hosts: &str) -> Result<(), crate::Failure> {
+    fn named(origins: &str, hosts: &str) -> Result<(), crate::failure::Failure> {
         let yon: YonMember =
             serde_json::from_str(&format!("{{\"origins\": {origins}}}")).expect("yon member");
         let outgoing: serde_json::Value =

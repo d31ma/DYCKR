@@ -88,7 +88,7 @@ impl ParameterText {
 
 #[cfg(test)]
 mod tests {
-    use crate::ParameterText;
+    use crate::parameter_text::ParameterText;
 
     #[test]
     fn csharp_attributes_with_json_arguments_leave_one_typed_parameter() {
