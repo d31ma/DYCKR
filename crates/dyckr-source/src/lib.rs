@@ -18,6 +18,7 @@ pub mod method_coverage;
 pub mod model_layout;
 pub mod model_sources;
 pub mod old_topic_logs;
+pub mod page_navigation;
 pub mod program_search;
 pub mod project;
 pub mod route_schema;
