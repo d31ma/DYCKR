@@ -16,12 +16,10 @@ impl StoredState {
     pub fn marks(name: &str) -> bool {
         name == Self::LOCAL || name == Self::SESSION
     }
-
 }
 use crate::behavior_marker::Marker;
 
 impl StoredState {
-
     pub fn mentioned(source: &str) -> bool {
         crate::stored_state::StoredState::SPELLINGS
             .iter()
@@ -47,7 +45,6 @@ impl StoredState {
 use crate::failure::{diagnostic, source_span};
 
 impl StoredState {
-
     pub fn marker_for(written: &str) -> &'static str {
         if written.starts_with("$$") {
             crate::stored_state::StoredState::LOCAL
@@ -80,7 +77,12 @@ impl StoredState {
         Some((line.find(word)?, word))
     }
 
-    pub fn sigil_failure(path: &Path, source: &str, at: usize, written: &str) -> crate::failure::Failure {
+    pub fn sigil_failure(
+        path: &Path,
+        source: &str,
+        at: usize,
+        written: &str,
+    ) -> crate::failure::Failure {
         let bare = written.trim_start_matches('$');
         let marker = crate::stored_state::StoredState::marker_for(written);
         let portable = path.to_string_lossy().replace('\\', "/");
@@ -100,14 +102,15 @@ impl StoredState {
 use std::path::Path;
 
 impl StoredState {
-
     pub fn sigil_fields(path: &Path, source: &str) -> Vec<crate::stored_state::SigilField> {
         let language = path
             .extension()
             .and_then(|value| value.to_str())
             .unwrap_or("");
         let mut fields = Vec::new();
-        if !crate::stored_state::StoredState::SIGIL_LANGUAGES.contains(&language) || !source.contains('$') {
+        if !crate::stored_state::StoredState::SIGIL_LANGUAGES.contains(&language)
+            || !source.contains('$')
+        {
             return fields;
         }
         let mask = crate::lexical::code_mask(language, source);
@@ -147,7 +150,12 @@ impl StoredState {
 
     pub fn refuse_sigils(path: &Path, source: &str) -> Result<(), crate::failure::Failure> {
         match crate::stored_state::StoredState::sigil_fields(path, source).first() {
-            Some(field) => Err(crate::stored_state::StoredState::sigil_failure(path, source, field.at, &field.written)),
+            Some(field) => Err(crate::stored_state::StoredState::sigil_failure(
+                path,
+                source,
+                field.at,
+                &field.written,
+            )),
             None => Ok(()),
         }
     }

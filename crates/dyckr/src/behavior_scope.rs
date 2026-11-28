@@ -3,19 +3,26 @@ use crate::behavior_marker::Marker;
 use crate::failure::Failure;
 use serde_json::{Map, Value};
 
-
 pub fn scope(input: &Input<'_>, marker: &Marker) -> Result<Value, Failure> {
     let options = object(input, marker, &["value"])?;
     let scope = options
         .get("value")
         .and_then(Value::as_str)
         .ok_or_else(|| input.failure(marker.span.start, "Lifetime requires a literal value"))?;
-    if !crate::native_application_lifetime::NativeApplicationLifetime::supported(input.path, scope) {
+    if !crate::native_application_lifetime::NativeApplicationLifetime::supported(input.path, scope)
+    {
         return Err(
-            crate::native_application_lifetime::NativeApplicationLifetime::unsupported(input.path, marker.span.start, scope)
-                .unwrap_or_else(|| {
-                    input.failure(marker.span.start, crate::native_application_lifetime::NativeApplicationLifetime::advice(scope))
-                }),
+            crate::native_application_lifetime::NativeApplicationLifetime::unsupported(
+                input.path,
+                marker.span.start,
+                scope,
+            )
+            .unwrap_or_else(|| {
+                input.failure(
+                    marker.span.start,
+                    crate::native_application_lifetime::NativeApplicationLifetime::advice(scope),
+                )
+            }),
         );
     }
     Ok(Value::String(scope.to_owned()))

@@ -1,4 +1,4 @@
-use crate::failure::{diagnostic, Failure};
+use crate::failure::{Failure, diagnostic};
 use serde::Serialize;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]

@@ -1,4 +1,4 @@
-use crate::failure::{diagnostic, Failure};
+use crate::failure::{Failure, diagnostic};
 
 pub fn native_tool_failure(number: u16, message: &str) -> Failure {
     Failure::one(diagnostic(

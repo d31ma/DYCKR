@@ -1,7 +1,7 @@
-use crate::model_mapping::ModelMapping;
 use crate::behavior_input::Input;
 use crate::behavior_marker::Marker;
 use crate::failure::Failure;
+use crate::model_mapping::ModelMapping;
 use serde_json::{Map, Value};
 
 struct MappingLimits;
@@ -229,7 +229,11 @@ impl ConvertSignature<'_> {
         Ok(serde_json::json!({"argument":0,"fields":entries}))
     }
 
-    pub fn json_types(input: &Input<'_>, marker: &Marker, model: Option<&str>) -> Result<(), Failure> {
+    pub fn json_types(
+        input: &Input<'_>,
+        marker: &Marker,
+        model: Option<&str>,
+    ) -> Result<(), Failure> {
         if let Some(model) = model {
             return Err(input.failure(marker.span.start,format!("Convert maps JSON values or models, and '{model}' is neither: declare it in the models folder, or use the language's JSON value type")));
         }
@@ -275,7 +279,11 @@ impl ConvertSignature<'_> {
         Ok(())
     }
 
-    pub fn check_entries(input: &Input<'_>, marker: &Marker, entries: &[Value]) -> Result<(), Failure> {
+    pub fn check_entries(
+        input: &Input<'_>,
+        marker: &Marker,
+        entries: &[Value],
+    ) -> Result<(), Failure> {
         let mut targets = std::collections::BTreeSet::new();
         for entry in entries {
             let plan = entry.as_object().ok_or_else(|| {
@@ -317,7 +325,9 @@ fn names_a_model(language: &str, type_text: &str) -> bool {
         .chars()
         .next()
         .is_some_and(|first| first.is_ascii_uppercase());
-    capitalized && crate::identifier::identifier(name) && !MappingLimits::JSON_TYPE_NAMES.contains(&name)
+    capitalized
+        && crate::identifier::identifier(name)
+        && !MappingLimits::JSON_TYPE_NAMES.contains(&name)
 }
 
 fn too_many_fields(input: &Input<'_>, marker: &Marker) -> Failure {
@@ -427,5 +437,3 @@ impl Plan {
         })
     }
 }
-
-

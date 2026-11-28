@@ -1,6 +1,6 @@
-use crate::piece::Piece;
 use crate::model_blocks::model_block::ModelBlock;
 use crate::model_blocks::type_name::TypeName;
+use crate::piece::Piece;
 
 pub struct BracedBlocks;
 

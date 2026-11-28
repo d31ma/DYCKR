@@ -1,5 +1,5 @@
-use crate::event_type::EventType;
 use crate::event_method::EventMethod;
+use crate::event_type::EventType;
 
 #[derive(Clone, Debug)]
 pub struct EventModule {

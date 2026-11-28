@@ -1,6 +1,6 @@
+use crate::failure::Failure;
 use crate::native_menu_config::NativeMenuConfig;
 use crate::native_menu_entry::NativeMenuEntry;
-use crate::failure::Failure;
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]

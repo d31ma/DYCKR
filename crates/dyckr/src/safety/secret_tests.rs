@@ -34,7 +34,10 @@ fn known_token_shapes_are_refused_in_every_kind_of_file() {
         ),
         (
             "server/application.json",
-            concat!("{\"map\": \"AIza", "SyA1234567890abcdefghijklmnopqrstuv\"}\n"),
+            concat!(
+                "{\"map\": \"AIza",
+                "SyA1234567890abcdefghijklmnopqrstuv\"}\n"
+            ),
             "a Google API key",
         ),
         (

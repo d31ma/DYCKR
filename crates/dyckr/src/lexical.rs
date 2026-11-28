@@ -1,6 +1,5 @@
-use std::ops::Range;
 use crate::lexical_mask::LexicalMask;
-
+use std::ops::Range;
 
 enum Region {
     Code,
@@ -340,9 +339,7 @@ fn unescaped_string_region(extension: &str, source: &str, start: usize) -> Optio
         let end = dart_raw_string_end(source, start);
         return Some(Region::from_end(end, "Unterminated Dart raw string"));
     }
-    if extension == "hpp"
-        && crate::cpp_raw_text::CppRawText::is_raw_string_start(bytes, start)
-    {
+    if extension == "hpp" && crate::cpp_raw_text::CppRawText::is_raw_string_start(bytes, start) {
         let end = crate::cpp_raw_text::CppRawText::raw_string_end(source, start);
         return Some(Region::from_end(end, "Unterminated C++ raw string"));
     }
@@ -426,9 +423,7 @@ fn quoted_string(extension: &str, bytes: &[u8], start: usize) -> Region {
     if extension == "rs" && is_rust_lifetime(bytes, start) {
         return Region::Code;
     }
-    if extension == "hpp"
-        && crate::cpp_raw_text::CppRawText::is_digit_separator(bytes, start)
-    {
+    if extension == "hpp" && crate::cpp_raw_text::CppRawText::is_digit_separator(bytes, start) {
         return Region::Code;
     }
     let end = escaped_string_end(bytes, start);

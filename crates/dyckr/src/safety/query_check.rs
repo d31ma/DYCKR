@@ -15,9 +15,7 @@ impl QueryCheck {
         "datasource database db cursor connection conn statement stmt pool";
     const HELP: &'static str = "Write the query text as one text literal or an UPPER_CASE constant, and pass every value in the parameter list, for example query(\"SELECT id FROM products WHERE name = $1\", [name]). A value joined into the query text lets a caller change the query (SQL injection). Redis keys and values are always parameters (ADR 0068).";
 
-    pub fn diagnostics<'a>(
-        files: impl Iterator<Item = (&'a Path, &'a [u8])>,
-    ) -> Vec<Diagnostic> {
+    pub fn diagnostics<'a>(files: impl Iterator<Item = (&'a Path, &'a [u8])>) -> Vec<Diagnostic> {
         Self::sources(files)
             .iter()
             .flat_map(Self::file_diagnostics)

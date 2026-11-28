@@ -15,9 +15,7 @@ impl ServiceReachCheck {
     const OTHER_REQUESTS: [&'static str; 2] = ["XMLHttpRequest", "navigator.sendBeacon"];
     const GLOBAL_HELP: &'static str = "A service gets the browser by injection: the window controls from `@Needs windowControls`, and each other browser API from its own `@Needs` field. Keep state that many services share in a service that they inject (ADR 0087).";
 
-    pub fn diagnostics<'a>(
-        files: impl Iterator<Item = (&'a Path, &'a [u8])>,
-    ) -> Vec<Diagnostic> {
+    pub fn diagnostics<'a>(files: impl Iterator<Item = (&'a Path, &'a [u8])>) -> Vec<Diagnostic> {
         files
             .filter(|(path, _)| Self::is_script_service(path))
             .flat_map(|(path, bytes)| Self::service_diagnostics(path, bytes))

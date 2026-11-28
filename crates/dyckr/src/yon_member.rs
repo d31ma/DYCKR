@@ -127,9 +127,7 @@ impl YonMember {
             .unwrap_or_default()
     }
 
-    pub fn declared_hosts(
-        outgoing: Option<&serde_json::Value>,
-    ) -> crate::safety::DeclaredHosts {
+    pub fn declared_hosts(outgoing: Option<&serde_json::Value>) -> crate::safety::DeclaredHosts {
         let hosts = outgoing
             .and_then(|member| {
                 crate::safety::DeclaredHosts::stored_hosts(member, Self::HOSTS_POINTER)

@@ -8,9 +8,7 @@ impl EvalCheck {
     const CODE: u16 = 1325;
     const HELP: &'static str = "Code that runs a text as code runs whatever an attacker can put into that text. Call the function or method you mean directly, or choose it from a fixed list with a switch (ADR 0068).";
 
-    pub fn diagnostics<'a>(
-        files: impl Iterator<Item = (&'a Path, &'a [u8])>,
-    ) -> Vec<Diagnostic> {
+    pub fn diagnostics<'a>(files: impl Iterator<Item = (&'a Path, &'a [u8])>) -> Vec<Diagnostic> {
         SafetyUtils::each_file(files, Self::file_diagnostics)
     }
 

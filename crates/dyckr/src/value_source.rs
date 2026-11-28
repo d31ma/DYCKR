@@ -1,6 +1,6 @@
-use crate::call_style::CallStyle;
 use crate::behavior_input::Input;
 use crate::behavior_marker::Marker;
+use crate::call_style::CallStyle;
 use crate::failure::Failure;
 use serde_json::{Map, Value};
 
@@ -56,24 +56,15 @@ impl ValueSource {
         Value::Array(rows)
     }
 
-    pub fn rust_calls(
-        cases: &[String],
-        inputs: &Map<String, Value>,
-    ) -> Vec<(String, String)> {
+    pub fn rust_calls(cases: &[String], inputs: &Map<String, Value>) -> Vec<(String, String)> {
         Self::calls(cases, inputs, &CallStyle::RUST)
     }
 
-    pub fn jvm_calls(
-        cases: &[String],
-        inputs: &Map<String, Value>,
-    ) -> Vec<(String, String)> {
+    pub fn jvm_calls(cases: &[String], inputs: &Map<String, Value>) -> Vec<(String, String)> {
         Self::calls(cases, inputs, &CallStyle::JVM)
     }
 
-    pub fn csharp_calls(
-        cases: &[String],
-        inputs: &Map<String, Value>,
-    ) -> Vec<(String, String)> {
+    pub fn csharp_calls(cases: &[String], inputs: &Map<String, Value>) -> Vec<(String, String)> {
         Self::calls(cases, inputs, &CallStyle::JSON)
     }
 

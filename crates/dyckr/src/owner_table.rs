@@ -1,6 +1,5 @@
 use crate::failure::Failure;
 
-
 pub fn owner_table(
     language: crate::companion_language::CompanionLanguage,
     source: &str,
@@ -15,9 +14,23 @@ pub fn owner_table(
         return Err(crate::companion_failures::authored_table(source_path));
     }
     if language == crate::companion_language::CompanionLanguage::Rust {
-        return crate::rust_owner_table::rust_owner_table(source, source_path, excluded, extra, needs_all);
+        return crate::rust_owner_table::rust_owner_table(
+            source,
+            source_path,
+            excluded,
+            extra,
+            needs_all,
+        );
     }
-    class_owner_table(language, source, source_path, excluded, extra, needs_all, constructed)
+    class_owner_table(
+        language,
+        source,
+        source_path,
+        excluded,
+        extra,
+        needs_all,
+        constructed,
+    )
 }
 
 pub fn class_owner_table(
@@ -30,8 +43,13 @@ pub fn class_owner_table(
     constructed: &[(String, String)],
 ) -> Result<String, Failure> {
     let wanted = crate::declared_service::declared_service(source_path, source);
-    let Some((name, body)) = crate::companion_syntax::class_body_named(source, wanted.as_deref()) else {
-        return Err(crate::companion_failures::unnamed_service(source_path, wanted.as_deref(), "class"));
+    let Some((name, body)) = crate::companion_syntax::class_body_named(source, wanted.as_deref())
+    else {
+        return Err(crate::companion_failures::unnamed_service(
+            source_path,
+            wanted.as_deref(),
+            "class",
+        ));
     };
     let constructs = !constructed.is_empty();
     let members = crate::companion_member::members(language, body, source_path)?;
@@ -44,11 +62,15 @@ pub fn class_owner_table(
     }
     entries.push_str(extra);
     if entries.trim().is_empty() {
-        return Err(crate::companion_failures::exposes_nothing(source_path, &name));
+        return Err(crate::companion_failures::exposes_nothing(
+            source_path,
+            &name,
+        ));
     }
     let required = if matches!(
         language,
-        crate::companion_language::CompanionLanguage::CSharp | crate::companion_language::CompanionLanguage::CSharpBrowser
+        crate::companion_language::CompanionLanguage::CSharp
+            | crate::companion_language::CompanionLanguage::CSharpBrowser
     ) {
         crate::class_table::csharp_required_members(body)
     } else {

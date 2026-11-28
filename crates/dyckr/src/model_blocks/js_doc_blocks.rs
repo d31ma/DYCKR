@@ -1,5 +1,5 @@
-use crate::piece::Piece;
 use crate::model_blocks::model_block::ModelBlock;
+use crate::piece::Piece;
 
 pub struct JsDocBlocks;
 

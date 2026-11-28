@@ -41,14 +41,14 @@ impl Realm {
     }
 }
 
-    pub const LANGUAGES: [&str; 16] = [
-        "js", "ts", "py", "php", "java", "groovy", "kt", "cs", "rs", "dart", "go", "swift", "rb",
-        "lua", "fs", "hpp",
-    ];
-    pub const YON: &[&str] = &[
-        "js", "ts", "py", "php", "java", "groovy", "kt", "cs", "fs", "rs", "dart", "go", "rb",
-        "lua", "hpp",
-    ];
-    pub const TAC: &[&str] = &[
-        "js", "ts", "rs", "cs", "dart", "go", "swift", "kt", "rb", "lua", "py", "java", "fs", "hpp",
-    ];
+pub const LANGUAGES: [&str; 16] = [
+    "js", "ts", "py", "php", "java", "groovy", "kt", "cs", "rs", "dart", "go", "swift", "rb",
+    "lua", "fs", "hpp",
+];
+pub const YON: &[&str] = &[
+    "js", "ts", "py", "php", "java", "groovy", "kt", "cs", "fs", "rs", "dart", "go", "rb", "lua",
+    "hpp",
+];
+pub const TAC: &[&str] = &[
+    "js", "ts", "rs", "cs", "dart", "go", "swift", "kt", "rb", "lua", "py", "java", "fs", "hpp",
+];

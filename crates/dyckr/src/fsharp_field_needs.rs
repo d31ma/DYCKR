@@ -1,12 +1,12 @@
+use crate::failure::Failure;
+use crate::failure::{diagnostic, source_span};
 use crate::fsharp_attribute_line::AttributeLine;
 use crate::fsharp_field_need::FieldNeed;
 use crate::fsharp_lexer::FsharpLexer;
+use crate::fsharp_line_kind::LineKind;
 use crate::fsharp_parameters::FsharpParameters;
 use crate::fsharp_type::FsharpType;
-use crate::fsharp_line_kind::LineKind;
 use crate::fsharp_type_header::TypeHeader;
-use crate::failure::Failure;
-use crate::failure::{diagnostic, source_span};
 use std::path::Path;
 
 pub struct FieldNeeds {

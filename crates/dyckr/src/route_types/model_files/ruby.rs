@@ -269,9 +269,9 @@ impl RubyModels {
 
 #[cfg(test)]
 mod tests {
+    use crate::route_types::Model;
     use crate::route_types::model_files::ruby::RubyModels;
-    use crate::route_types::{Model};
-use crate::shape::Shape;
+    use crate::shape::Shape;
 
     fn fields(source: &str, name: &str) -> Vec<(String, Shape, bool)> {
         let models = RubyModels::read(source);

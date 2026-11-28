@@ -1,6 +1,6 @@
-use std::path::{Path, PathBuf};
 use crate::failure::Failure;
 use crate::lua_shadow::LuaShadow;
+use std::path::{Path, PathBuf};
 use tachyon_diagnostics::{Diagnostic, SourceSpan};
 
 pub struct LuaView {
@@ -34,7 +34,10 @@ impl LuaView {
     }
 
     pub fn joined(path: &Path, source: &str) -> Self {
-        let shadows: [fn(&str) -> crate::lua_shadow::LuaShadow; 2] = [crate::lua_shadow::LuaShadow::joined, crate::lua_shadow::LuaShadow::yon];
+        let shadows: [fn(&str) -> crate::lua_shadow::LuaShadow; 2] = [
+            crate::lua_shadow::LuaShadow::joined,
+            crate::lua_shadow::LuaShadow::yon,
+        ];
         let shadow = shadows[usize::from(path.starts_with(LuaView::YON_REALM))](source);
         LuaView::with_shadow(path, source, shadow)
     }
@@ -108,7 +111,10 @@ impl LuaView {
         Failure::new(self.diagnostics(failure.diagnostics()))
     }
 
-    pub fn checked<T>(&self, check: &impl Fn(&Path, &str) -> Result<T, Failure>) -> Result<T, Failure> {
+    pub fn checked<T>(
+        &self,
+        check: &impl Fn(&Path, &str) -> Result<T, Failure>,
+    ) -> Result<T, Failure> {
         check(self.path(), self.text()).map_err(|failure| self.failure(&failure))
     }
 

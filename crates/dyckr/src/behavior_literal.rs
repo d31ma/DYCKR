@@ -7,7 +7,9 @@ struct BehaviorLiteral(Value);
 
 impl<'de> Deserialize<'de> for BehaviorLiteral {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        deserializer.deserialize_any(BehaviorLiteralVisitor).map(Self)
+        deserializer
+            .deserialize_any(BehaviorLiteralVisitor)
+            .map(Self)
     }
 }
 
@@ -47,7 +49,9 @@ impl<'de> Visitor<'de> for BehaviorLiteralVisitor {
     }
     fn visit_map<A: MapAccess<'de>>(self, mut object: A) -> Result<Value, A::Error> {
         let mut values = Map::new();
-        while let Some((key, BehaviorLiteral(value))) = object.next_entry::<String, BehaviorLiteral>()? {
+        while let Some((key, BehaviorLiteral(value))) =
+            object.next_entry::<String, BehaviorLiteral>()?
+        {
             if values.insert(key, value).is_some() {
                 return Err(de::Error::custom("duplicate policy key"));
             }
@@ -59,7 +63,6 @@ impl<'de> Visitor<'de> for BehaviorLiteralVisitor {
 pub fn parse(source: &str) -> Result<Value, serde_json::Error> {
     serde_json::from_str::<BehaviorLiteral>(source).map(|literal| literal.0)
 }
-
 
 pub fn reference_and_options(arguments: &str) -> (&str, Option<&str>) {
     let Some(comma) = top_level_comma(arguments) else {
@@ -99,8 +102,15 @@ fn top_level_comma(text: &str) -> Option<usize> {
 mod tests {
     #[test]
     fn rejects_nested_duplicate_policy_keys() {
-        assert!(crate::behavior_literal::parse(r#"{"fields":{"port":{"type":"integer","type":"string"}}}"#).is_err());
-        assert!(crate::behavior_literal::parse(r#"{"values":[null,true,1,-1,1.5,"text"]}"#).is_ok());
+        assert!(
+            crate::behavior_literal::parse(
+                r#"{"fields":{"port":{"type":"integer","type":"string"}}}"#
+            )
+            .is_err()
+        );
+        assert!(
+            crate::behavior_literal::parse(r#"{"values":[null,true,1,-1,1.5,"text"]}"#).is_ok()
+        );
     }
 
     #[test]
@@ -133,11 +143,19 @@ mod tests {
 
     #[test]
     fn options_start_after_the_first_top_level_comma() {
-        assert_eq!(crate::behavior_literal::reference_and_options(" Order "), ("Order", None));
         assert_eq!(
-            crate::behavior_literal::reference_and_options("typeof(Order), {\"a\":[1,2],\"b\":\"x,y\"}"),
+            crate::behavior_literal::reference_and_options(" Order "),
+            ("Order", None)
+        );
+        assert_eq!(
+            crate::behavior_literal::reference_and_options(
+                "typeof(Order), {\"a\":[1,2],\"b\":\"x,y\"}"
+            ),
             ("typeof(Order)", Some("{\"a\":[1,2],\"b\":\"x,y\"}"))
         );
-        assert_eq!(crate::behavior_literal::reference_and_options("Order,"), ("Order", Some("")));
+        assert_eq!(
+            crate::behavior_literal::reference_and_options("Order,"),
+            ("Order", Some(""))
+        );
     }
 }

@@ -1,4 +1,3 @@
-
 pub fn csharp_required_members(body: &str) -> Vec<String> {
     body.lines()
         .filter(|line| !line.contains('('))
@@ -35,7 +34,8 @@ pub fn class_table(
                 "\nfun tacCreate(tacProps: Map<String, Any?>?, tacPage: TacPageScope): Map<String, Any> {{\nval tacInstance = {name}({arguments})\nreturn linkedMapOf(\n{entries})\n}}\n"
             )
         }
-        crate::companion_language::CompanionLanguage::CSharp | crate::companion_language::CompanionLanguage::CSharpBrowser => {
+        crate::companion_language::CompanionLanguage::CSharp
+        | crate::companion_language::CompanionLanguage::CSharpBrowser => {
             let filled = required
                 .iter()
                 .map(|member| format!("{member} = default!"))

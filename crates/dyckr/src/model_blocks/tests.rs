@@ -236,4 +236,3 @@ fn javascript_schema_classes_and_jsdoc_types_keep_their_owned_blocks() {
     assert!(blocks[1].starts_with("@Checked") && blocks[1].contains("class OrderInput"));
     assert!(!blocks[1].contains("const decoy"));
 }
-

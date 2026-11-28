@@ -1,10 +1,12 @@
-use crate::csharp_model_type::CsharpModelType;
-use crate::companion_member::{Member, csharp_arguments, csharp_parameters, without_type_first_modifiers};
+use crate::companion_member::{
+    Member, csharp_arguments, csharp_parameters, without_type_first_modifiers,
+};
 use crate::companion_syntax::class_body_named;
+use crate::csharp_model_type::CsharpModelType;
 use crate::declared_service::declared_service;
-use crate::lower_first::lower_first;
 use crate::failure::Failure;
 use crate::failure::{diagnostic, source_span};
+use crate::lower_first::lower_first;
 use crate::route_types::ModelTable;
 use crate::unicode_name::UnicodeName;
 

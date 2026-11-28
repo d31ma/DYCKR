@@ -40,11 +40,7 @@ impl PythonMarkers {
 impl PythonAnnotated {
     const OPENING: &'static str = "Annotated[";
 
-    pub fn markers(
-        code: &str,
-        source: &str,
-        is_marker: impl Fn(&str) -> bool,
-    ) -> PythonMarkers {
+    pub fn markers(code: &str, source: &str, is_marker: impl Fn(&str) -> bool) -> PythonMarkers {
         let mut found = PythonMarkers {
             markers: Vec::new(),
             erased: Vec::new(),

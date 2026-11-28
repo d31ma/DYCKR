@@ -1,4 +1,6 @@
-use crate::companion_syntax::{after_declaration_keyword, class_body_named, closing_parenthesis, rust_field_declarations};
+use crate::companion_syntax::{
+    after_declaration_keyword, class_body_named, closing_parenthesis, rust_field_declarations,
+};
 use crate::failure::Failure;
 use crate::failure::{diagnostic, source_span};
 use crate::unicode_name::UnicodeName;
@@ -16,11 +18,7 @@ impl KotlinHeader {
         Self::check_constructor(path, &code, class)
     }
 
-    pub fn primary_types(
-        path: &Path,
-        source: &str,
-        class: &str,
-    ) -> Result<Vec<String>, Failure> {
+    pub fn primary_types(path: &Path, source: &str, class: &str) -> Result<Vec<String>, Failure> {
         let code = crate::source_mask::masked_source(path, source)?;
         let header = Self::header(&code, class).unwrap_or_default();
         Self::parameter_types(path, Self::primary(header).unwrap_or_default())

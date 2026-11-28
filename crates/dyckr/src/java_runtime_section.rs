@@ -14,7 +14,10 @@ impl JavaRuntimeSection {
     }
 
     pub fn joined(self, other: &Self) -> Option<Self> {
-        other.entries.iter().try_fold(self, crate::java_runtime_section::JavaRuntimeSection::with)
+        other
+            .entries
+            .iter()
+            .try_fold(self, crate::java_runtime_section::JavaRuntimeSection::with)
     }
 
     pub fn text(&self) -> String {
@@ -34,5 +37,3 @@ impl JavaRuntimeSection {
         Some(self)
     }
 }
-
-

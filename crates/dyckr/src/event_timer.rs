@@ -65,8 +65,7 @@ impl EventTimer {
         at: usize,
     ) -> Result<Self, Failure> {
         Self::check_parameters(path, parameters, at)?;
-        let every =
-            Self::duration(arguments).ok_or_else(|| failure(path, at, Self::FORM))?;
+        let every = Self::duration(arguments).ok_or_else(|| failure(path, at, Self::FORM))?;
         Ok(Self {
             method: method.to_owned(),
             every,

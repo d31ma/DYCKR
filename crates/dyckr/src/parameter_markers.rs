@@ -6,4 +6,3 @@ pub fn is_parameter_marker(name: &str) -> bool {
         .iter()
         .any(|marker| marker.to_ascii_lowercase() == normalized)
 }
-

@@ -1,5 +1,5 @@
-use crate::xml_escape::xml_escape;
 use crate::quoted_string_escape::quoted_string_escape;
+use crate::xml_escape::xml_escape;
 use serde::Deserialize;
 use std::collections::BTreeSet;
 

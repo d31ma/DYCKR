@@ -202,7 +202,7 @@ impl Default for SourceChanges {
 #[cfg(test)]
 mod tests {
     use crate::hot_update::{SourceAction, SourceChanges};
-    
+
     use notify::{Event, EventKind};
     use std::path::Path;
 

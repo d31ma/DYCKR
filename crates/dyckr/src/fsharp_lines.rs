@@ -55,5 +55,4 @@ mod tests {
         let shadow = crate::fsharp_shadow::FsharpShadow::of(source);
         assert!(shadow.text().contains("Two("), "{}", shadow.text());
     }
-
 }

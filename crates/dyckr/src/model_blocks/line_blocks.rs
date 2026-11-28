@@ -1,6 +1,6 @@
-use crate::piece::Piece;
-use crate::model_blocks::model_block::ModelBlock;
 use crate::ascii_name::AsciiName;
+use crate::model_blocks::model_block::ModelBlock;
+use crate::piece::Piece;
 
 pub struct LineBlocks<'a> {
     code: &'a str,

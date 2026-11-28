@@ -1,18 +1,17 @@
+use crate::companion_failures::unnamed_service;
 use crate::companion_language::CompanionLanguage;
-use crate::kotlin_member::KotlinMember;
 use crate::companion_member::{Member, members};
 use crate::companion_syntax::{class_body_named, closing_parenthesis, parameter_type};
 use crate::declared_service::declared_service;
-use crate::companion_failures::unnamed_service;
 use crate::failure::Failure;
 use crate::failure::{diagnostic, source_span};
+use crate::kotlin_member::KotlinMember;
 use std::collections::BTreeSet;
 use std::path::Path;
 
 pub struct KotlinMembers;
 
 impl KotlinMembers {
-    
     pub fn owned(
         path: &Path,
         source: &str,
@@ -89,7 +88,12 @@ impl KotlinMembers {
             .then(|| String::from("Unit"))
     }
 
-    pub fn require_type(path: &Path, source: &str, member: &Member, kind: &str) -> Result<(), Failure> {
+    pub fn require_type(
+        path: &Path,
+        source: &str,
+        member: &Member,
+        kind: &str,
+    ) -> Result<(), Failure> {
         Self::shape(kind).map_err(|message| Self::failure(path, source, member, &message))
     }
 

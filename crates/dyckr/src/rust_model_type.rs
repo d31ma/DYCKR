@@ -2,7 +2,8 @@ pub struct RustModelType;
 
 impl RustModelType {
     pub const CONTAINERS: [&'static str; 2] = ["Vec", "Option"];
-    pub const MODEL_SCALARS: [&'static str; 6] = ["String", "i64", "i32", "f64", "bool", "TacValue"];
+    pub const MODEL_SCALARS: [&'static str; 6] =
+        ["String", "i64", "i32", "f64", "bool", "TacValue"];
     pub const NOT_MODELS: [&'static str; 2] = ["String", "TacValue"];
     pub const RUNTIME_PREFIX: &'static str = "Behavior";
     pub const JSON_SCALARS: [&'static str; 16] = [

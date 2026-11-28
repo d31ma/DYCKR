@@ -1,8 +1,8 @@
 use crate::failure::Failure;
-use crate::realm::Realm;
 use crate::failure::{diagnostic, source_span};
-use crate::topic_access::TopicAccess;
+use crate::realm::Realm;
 use crate::route_access::RouteAccess;
+use crate::topic_access::TopicAccess;
 use std::ops::Range;
 use std::path::{Component, Path};
 
@@ -67,11 +67,7 @@ impl Topics {
             .collect()
     }
 
-    pub fn rules(
-        path: &Path,
-        source: &str,
-        declared: &[String],
-    ) -> Vec<(String, RouteAccess)> {
+    pub fn rules(path: &Path, source: &str, declared: &[String]) -> Vec<(String, RouteAccess)> {
         let extension = Self::extension(path);
         Self::markers(source)
             .into_iter()
@@ -140,7 +136,6 @@ impl Topics {
         }
         (slug.len() <= Self::MAX_SLUG_BYTES).then_some(slug)
     }
-
 
     pub fn check_access(
         path: &Path,

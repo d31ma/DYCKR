@@ -394,7 +394,11 @@ impl RustConstruction {
             .map(|parameters| self.constructor(name, parameters, trail))
             .or_else(|| self.default(name))
             .or_else(|| fills_fields.then(|| self.filled(name, trail)))
-            .unwrap_or_else(|| Err(crate::companion_failures::missing_constructor(&self.path, name)))
+            .unwrap_or_else(|| {
+                Err(crate::companion_failures::missing_constructor(
+                    &self.path, name,
+                ))
+            })
     }
 
     fn default(&self, name: &str) -> Option<Result<String, Failure>> {
@@ -499,7 +503,9 @@ impl RustConstruction {
 
     fn default_field(&self, kind: &str) -> Result<String, Failure> {
         let declaration = format!("field: {kind}");
-        if crate::companion_member::rust_field(&declaration).is_none() && !Self::BUILTIN_PROVIDERS.contains(&kind) {
+        if crate::companion_member::rust_field(&declaration).is_none()
+            && !Self::BUILTIN_PROVIDERS.contains(&kind)
+        {
             return Err(self.failure(kind, "is an unsupported native constructor input; trait bindings, mutexes and owned threads need an explicit composition contract"));
         }
         Ok(String::from("::core::default::Default::default()"))
@@ -519,8 +525,8 @@ impl RustConstruction {
 
 #[cfg(test)]
 mod tests {
-    use crate::rust_construction::RustConstruction;
     use crate::failure::Failure;
+    use crate::rust_construction::RustConstruction;
     use std::collections::BTreeSet;
 
     fn assert_constructor_failure(failure: &Failure, path: &str, message: &str) {

@@ -138,7 +138,10 @@ pub fn owner_table_named(table: &GoTable<'_>, factory: &str) -> Result<String, F
     }
     entries.sort();
     if entries.is_empty() && table.extra.trim().is_empty() {
-        return Err(crate::companion_failures::exposes_nothing(table.source_path, table.class));
+        return Err(crate::companion_failures::exposes_nothing(
+            table.source_path,
+            table.class,
+        ));
     }
     let start = "tachyonInject";
     let starts_needs = code.contains(&format!("func (service *{}) {start}() error", table.class));

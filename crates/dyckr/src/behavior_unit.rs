@@ -34,12 +34,12 @@ impl Unit {
             .into_iter()
             .flat_map(crate::sorted_json::SortedJson::entries)
             .map(|(path, value)| {
-                let text = value
-                    .as_str()
-                    .map_or_else(|| crate::sorted_json::SortedJson::text(value), str::to_owned);
+                let text = value.as_str().map_or_else(
+                    || crate::sorted_json::SortedJson::text(value),
+                    str::to_owned,
+                );
                 (path.replace('.', "_").to_uppercase(), text)
             })
             .collect()
     }
 }
-

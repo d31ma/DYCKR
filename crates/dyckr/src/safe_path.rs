@@ -1,4 +1,3 @@
-
 pub fn safe_path(path: &str) -> bool {
     if !path.starts_with('/') || path.starts_with("//") || path.len() > 2048 {
         return false;

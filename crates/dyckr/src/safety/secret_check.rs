@@ -20,9 +20,7 @@ impl SecretCheck {
         "js mjs cjs ts py php java kt cs rs dart go rb swift html css json yaml yml toml";
     const HELP: &'static str = "Secrets never go in source code, templates or public configuration. Put the value in the private file .env with a YON_ name and read it through the Yon configuration (docs/APPLICATION_CONFIGURATION.md, \"Which secrets are allowed\"); code that runs in the browser gets no secrets at all. A test or a guide may keep an obvious example value: write a comment with `tachyon: example secrets` in the file and make the value say that it is an example, such as `sk_live_example`.";
 
-    pub fn diagnostics<'a>(
-        files: impl Iterator<Item = (&'a Path, &'a [u8])>,
-    ) -> Vec<Diagnostic> {
+    pub fn diagnostics<'a>(files: impl Iterator<Item = (&'a Path, &'a [u8])>) -> Vec<Diagnostic> {
         SafetyUtils::each_file(files, Self::file_diagnostics)
     }
 

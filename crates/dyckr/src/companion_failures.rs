@@ -1,4 +1,3 @@
-
 pub fn exposes_nothing(source_path: &str, name: &str) -> crate::failure::Failure {
     crate::failure::Failure::one(crate::failure::diagnostic(
         1406,
@@ -11,7 +10,11 @@ pub fn exposes_nothing(source_path: &str, name: &str) -> crate::failure::Failure
     ))
 }
 
-pub fn unnamed_service(source_path: &str, wanted: Option<&str>, keyword: &str) -> crate::failure::Failure {
+pub fn unnamed_service(
+    source_path: &str,
+    wanted: Option<&str>,
+    keyword: &str,
+) -> crate::failure::Failure {
     let Some(wanted) = wanted else {
         return missing_type("Companion", source_path, "native");
     };

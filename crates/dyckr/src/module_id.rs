@@ -1,7 +1,6 @@
-use std::path::Path;
-use std::fmt::Write as _;
 use sha2::{Digest, Sha256};
-
+use std::fmt::Write as _;
+use std::path::Path;
 
 pub fn module_id(path: &Path) -> String {
     let portable = path.to_string_lossy().replace('\\', "/");
@@ -16,4 +15,3 @@ pub fn module_id(path: &Path) -> String {
     }
     encoded
 }
-

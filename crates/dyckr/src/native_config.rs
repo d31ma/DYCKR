@@ -1,8 +1,8 @@
+use crate::config_failure::config_failure;
+use crate::failure::Failure;
+use crate::native_site::{RawCacheRule, SiteMetadata, SitemapValues};
 use crate::valid_icon_source::valid_icon_source;
 use crate::valid_route::valid_route;
-use crate::config_failure::config_failure;
-use crate::native_site::{RawCacheRule, SiteMetadata, SitemapValues};
-use crate::failure::Failure;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -207,7 +207,6 @@ fn valid_manifest_name(name: &str) -> bool {
         && !name.chars().any(char::is_control)
         && !executable_name(name).is_empty()
 }
-
 
 fn valid_version(version: &str) -> bool {
     if version.is_empty() || version.len() > 64 {
@@ -430,8 +429,9 @@ impl WebAppManifest {
 
     fn from_source(source: &str) -> Result<WebAppManifest, Failure> {
         let manifest_name = WebAppManifest::SOURCE_PATH;
-        let manifest: WebAppManifest = serde_json::from_str(crate::without_bom::without_bom(source))
-            .map_err(|error| config_failure(&format!("{manifest_name} is invalid: {error}")))?;
+        let manifest: WebAppManifest =
+            serde_json::from_str(crate::without_bom::without_bom(source))
+                .map_err(|error| config_failure(&format!("{manifest_name} is invalid: {error}")))?;
         validate_manifest(&manifest)?;
         Ok(manifest)
     }
@@ -485,9 +485,7 @@ impl WebAppManifest {
         self.tac.as_ref()?.application.as_ref()
     }
 
-    pub fn browser_api_permissions(
-        &self,
-    ) -> crate::browser_api_permissions::BrowserApiPermissions {
+    pub fn browser_api_permissions(&self) -> crate::browser_api_permissions::BrowserApiPermissions {
         let granted = self
             .tac
             .as_ref()
@@ -763,7 +761,9 @@ impl NativeApplication {
     }
 
     pub fn content_security_policy(&self) -> String {
-        crate::content_security_policy::ContentSecurityPolicy::native_host(&self.outgoing.connect_sources())
+        crate::content_security_policy::ContentSecurityPolicy::native_host(
+            &self.outgoing.connect_sources(),
+        )
     }
 }
 

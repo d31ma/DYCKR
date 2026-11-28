@@ -1,5 +1,5 @@
-use std::path::Path;
 use crate::failure::{Failure, diagnostic, source_span};
+use std::path::Path;
 
 const MAX_CAPTURED_SOURCE: usize = 16 * 1024 * 1024;
 

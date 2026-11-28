@@ -1,12 +1,12 @@
-use crate::failure::Failure;
-use crate::unicode_name::UnicodeName;
-use crate::companion_language::CompanionLanguage;
-use crate::modifiers::Modifiers;
-use crate::companion_syntax::*;
-use crate::companion_failures::missing_type;
-use crate::rust_model_type::RustModelType;
 use crate::companion_converters::kotlin_value;
+use crate::companion_failures::missing_type;
+use crate::companion_language::CompanionLanguage;
+use crate::companion_syntax::*;
+use crate::failure::Failure;
 use crate::lower_first::lower_first;
+use crate::modifiers::Modifiers;
+use crate::rust_model_type::RustModelType;
+use crate::unicode_name::UnicodeName;
 
 pub struct Member {
     pub name: String,
@@ -16,7 +16,6 @@ pub struct Member {
     pub parameters: Option<Vec<String>>,
     pub asynchronous: bool,
 }
-
 
 impl Member {
     pub fn is_runtime_resource(annotation: &str) -> bool {
@@ -150,20 +149,6 @@ impl Member {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 pub fn members(
     language: CompanionLanguage,
     body: &str,
@@ -200,7 +185,6 @@ pub fn rust_struct_fields(body: &str) -> Vec<Member> {
     }
     fields
 }
-
 
 pub fn rust_field(line: &str) -> Option<Member> {
     let line = line
@@ -261,7 +245,11 @@ pub fn rust_method(line: &str) -> Option<(Member, Vec<String>)> {
     }
     let returns = rust_return_type(arguments);
     let crosses = |kind: &str| kind == "()" || RustModelType::crosses(kind);
-    let task = [asynchronous, crate::rust_task_member::RustTaskMember::fallible(returns.as_deref())].contains(&true);
+    let task = [
+        asynchronous,
+        crate::rust_task_member::RustTaskMember::fallible(returns.as_deref()),
+    ]
+    .contains(&true);
     let shown = if task {
         crate::rust_task_member::RustTaskMember::crosses(returns.as_deref())
     } else {
@@ -309,13 +297,6 @@ pub fn rust_parameters(arguments: &str) -> Option<Vec<String>> {
     Some(kinds)
 }
 
-
-
-
-
-
-
-
 pub fn declaration(
     language: CompanionLanguage,
     line: &str,
@@ -325,15 +306,17 @@ pub fn declaration(
         CompanionLanguage::Swift => {
             name_first(line, source_path, "var", "let", "func", "tac.swift")
         }
-        CompanionLanguage::Kotlin => crate::kotlin_member_syntax::public_declaration(strip_attribute(line))
-            .map_or(Ok(None), |line| {
-                let (asynchronous, line) = crate::kotlin_member_syntax::suspended(line);
-                let found = name_first(line, source_path, "var", "val", "fun", "tac.kt")?;
-                Ok(found.map(|member| Member {
-                    asynchronous,
-                    ..member
-                }))
-            }),
+        CompanionLanguage::Kotlin => crate::kotlin_member_syntax::public_declaration(
+            strip_attribute(line),
+        )
+        .map_or(Ok(None), |line| {
+            let (asynchronous, line) = crate::kotlin_member_syntax::suspended(line);
+            let found = name_first(line, source_path, "var", "val", "fun", "tac.kt")?;
+            Ok(found.map(|member| Member {
+                asynchronous,
+                ..member
+            }))
+        }),
         CompanionLanguage::CSharp | CompanionLanguage::CSharpBrowser => Ok(type_first(line)),
         CompanionLanguage::Rust => Ok(None),
     }
@@ -424,13 +407,11 @@ pub fn typed_parameters(list: &str) -> Vec<String> {
 }
 
 pub fn typed_parameter(parameter: &str) -> Option<String> {
-    let (names, declared) = crate::parameter_text::ParameterText::without_annotations(parameter).split_once(':')?;
+    let (names, declared) =
+        crate::parameter_text::ParameterText::without_annotations(parameter).split_once(':')?;
     let kind = declared.split('=').next().unwrap_or_default().trim();
     (!kind.is_empty()).then(|| format!("{}: {kind}", names.trim()))
 }
-
-
-
 
 pub fn type_first(line: &str) -> Option<Member> {
     let line = line.trim();
@@ -482,8 +463,12 @@ pub fn csharp_declared_type(line: &str) -> Option<(String, &str)> {
     if name.is_empty() {
         return None;
     }
-    let (declared_type, rest) = crate::csharp_model_type::CsharpModelType::declared(line, name.len())?;
-    if rest.starts_with('<') || rest.starts_with('?') || crate::csharp_model_type::CsharpModelType::is_task(&declared_type) {
+    let (declared_type, rest) =
+        crate::csharp_model_type::CsharpModelType::declared(line, name.len())?;
+    if rest.starts_with('<')
+        || rest.starts_with('?')
+        || crate::csharp_model_type::CsharpModelType::is_task(&declared_type)
+    {
         return None;
     }
     Some((declared_type, rest))
@@ -552,8 +537,6 @@ pub fn after_closing_parenthesis(arguments: &str) -> &str {
     }
     arguments
 }
-
-
 
 pub fn entry(language: CompanionLanguage, member: &Member) -> String {
     match language {
@@ -658,12 +641,17 @@ pub fn csharp_entry(member: &Member) -> String {
             "        [\"{key}\"] = TacMember.Method(arguments => TacMember.Result(() => Instance.{name}({passed}))),\n"
         ),
         (true, kind, _) => {
-            let call =
-                crate::csharp_model_type::CsharpModelType::value(kind.as_deref(), &format!("Instance.{name}({passed})"));
+            let call = crate::csharp_model_type::CsharpModelType::value(
+                kind.as_deref(),
+                &format!("Instance.{name}({passed})"),
+            );
             format!("        [\"{key}\"] = TacMember.Method(arguments => {call}),\n")
         }
         (false, kind, mutable) => {
-            let read = crate::csharp_model_type::CsharpModelType::value(kind.as_deref(), &format!("Instance.{name}"));
+            let read = crate::csharp_model_type::CsharpModelType::value(
+                kind.as_deref(),
+                &format!("Instance.{name}"),
+            );
             let write = kind
                 .as_deref()
                 .filter(|_| mutable)
@@ -675,17 +663,12 @@ pub fn csharp_entry(member: &Member) -> String {
     }
 }
 
-
-
-
-
-
 pub fn csharp_parameters(after_name: &str) -> Option<Vec<String>> {
     let mut kinds = Vec::new();
     for parameter in crate::parameter_text::ParameterText::csharp_parameters(after_name)? {
         let kind = parameter.split_whitespace().next()?;
-        let readable_model =
-            crate::csharp_model_type::CsharpModelType::is_model(kind) && crate::csharp_model_type::CsharpModelType::read(kind, kind).is_some();
+        let readable_model = crate::csharp_model_type::CsharpModelType::is_model(kind)
+            && crate::csharp_model_type::CsharpModelType::read(kind, kind).is_some();
         let supported = readable_model
             || matches!(
                 kind,
@@ -707,7 +690,9 @@ pub fn csharp_arguments(parameters: &[String]) -> String {
             "object" => value,
             "float" => format!("Convert.ToSingle({value})"),
             "BehaviorJSON" => format!("BehaviorJSON.Parse(Tac.EncodeValue({value}))"),
-            other => crate::csharp_model_type::CsharpModelType::reading(other, &value).unwrap_or(value),
+            other => {
+                crate::csharp_model_type::CsharpModelType::reading(other, &value).unwrap_or(value)
+            }
         };
         arguments.push(argument);
     }

@@ -1,4 +1,4 @@
-use crate::annotation_target::{Target, Arguments};
+use crate::annotation_target::{Arguments, Target};
 use crate::realm::{Realm, TAC, YON};
 
 pub struct Rule {
@@ -22,7 +22,11 @@ pub struct Rule {
 }
 
 impl Rule {
-    pub const fn new(name: &'static str, targets: &'static [Target], meaning: &'static str) -> Self {
+    pub const fn new(
+        name: &'static str,
+        targets: &'static [Target],
+        meaning: &'static str,
+    ) -> Self {
         Self {
             name,
             meaning,
@@ -44,7 +48,11 @@ impl Rule {
         }
     }
 
-    pub const fn retired(name: &'static str, replaced_by: &'static str, advice: &'static str) -> Self {
+    pub const fn retired(
+        name: &'static str,
+        replaced_by: &'static str,
+        advice: &'static str,
+    ) -> Self {
         Self {
             replaced_by,
             advice,
@@ -245,7 +253,8 @@ impl AnnotationRules {
         "StreamRequest",
         "SocketRequest",
     ];
-    pub const SOCKET_EVENTS: &'static [&'static str] = &["OnOpen", "OnMessage", "OnClose", "OnError"];
+    pub const SOCKET_EVENTS: &'static [&'static str] =
+        &["OnOpen", "OnMessage", "OnClose", "OnError"];
     pub const SOCKET_ADVICE: &'static str = "A socket class is a Yon controller in server/controllers/, written in any Yon language. In the browser, receive its messages with @SocketRequest on an @HTTPClient method";
     pub const ROUTE_SOURCES: &'static [&'static str] = &[
         "FromPath",
@@ -266,7 +275,7 @@ impl AnnotationRules {
     pub const HELPER_ADVICE: &'static str = "Tac Delegate supports JavaScript, TypeScript, Dart, compiled Rust, C++, Swift, the synchronous Python ownership adapter, Go Delegates owned by the service that needs or creates them, Ruby Delegates that their service creates on first use, Kotlin, Java, C# and F# Needs fields (each needing class makes its own Delegate), Lua Delegates that their service builds with itself, and caller-owned C#/F# composition with new. Ruby, Kotlin, Java, C#, F# and Lua Delegates have no OnStart, OnStop or OnEvent. A Swift Delegate is built by the field that needs it, so it has an init() without arguments. C# and F# Delegates have no NeedsAll or Lifetime. F# Delegates require an ordinary primary constructor, and their Needs properties name other Delegates or the page service that the Delegate takes on.";
     pub const RUBY_NEEDS_ADVICE: &'static str = "A Ruby NeedsAll class lists each field as `attr_reader :order_store` and writes no `initialize`; a Ruby class that needs default values writes a plain `initialize` and no NeedsAll";
 
-        pub const ALL: &'static [Rule] = &[
+    pub const ALL: &'static [Rule] = &[
         Rule::new(
             "Test",
             Self::TYPE,
@@ -865,7 +874,6 @@ impl AnnotationRules {
         let normalized = plain.replace('_', "").to_ascii_lowercase();
         Self::rules().find(|rule| rule.name.to_ascii_lowercase() == normalized)
     }
-
 }
 impl Rule {
     pub const fn route_verb(name: &'static str, meaning: &'static str) -> Self {

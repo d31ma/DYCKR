@@ -1,5 +1,5 @@
-use crate::topics::Topics;
 use crate::route_access::RouteAccess;
+use crate::topics::Topics;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]

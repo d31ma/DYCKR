@@ -23,4 +23,3 @@ pub enum Arguments {
     Optional,
     Required,
 }
-

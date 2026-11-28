@@ -1,5 +1,5 @@
-use crate::route_types::{Model, Record, Shape, TypeText};
 use crate::ascii_name::AsciiName;
+use crate::route_types::{Model, Record, Shape, TypeText};
 use std::ops::Range;
 use std::path::{Path, PathBuf};
 
@@ -279,7 +279,6 @@ impl ModelParser {
         }
     }
 }
-
 
 #[derive(Default)]
 struct Quotes {

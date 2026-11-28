@@ -31,7 +31,11 @@ fn piece(bytes: &[u8], at: usize) -> String {
 }
 
 fn boundary(bytes: &[u8], at: usize) -> bool {
-    let before = at.checked_sub(1).and_then(|at| bytes.get(at)).copied().unwrap_or(b' ');
+    let before = at
+        .checked_sub(1)
+        .and_then(|at| bytes.get(at))
+        .copied()
+        .unwrap_or(b' ');
     let after = bytes.get(at + 1).copied().unwrap_or(b' ');
     let after_word = [before.is_ascii_lowercase(), before.is_ascii_digit()].contains(&true);
     let acronym_end = [before.is_ascii_uppercase(), after.is_ascii_lowercase()] == [true, true];

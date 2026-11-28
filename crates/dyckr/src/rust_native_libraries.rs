@@ -1,6 +1,6 @@
-use crate::native_tool_failure::native_tool_failure;
-use crate::failure::Failure;
 use crate::external_command::ToolOutput;
+use crate::failure::Failure;
+use crate::native_tool_failure::native_tool_failure;
 
 #[cfg(test)]
 mod tests;

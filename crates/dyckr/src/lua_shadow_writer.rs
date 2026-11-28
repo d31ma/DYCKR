@@ -1,7 +1,7 @@
+use crate::lua_body_sanitizer::LuaBodySanitizer;
+use crate::lua_line::LuaLine;
 use crate::lua_shadow::LuaShadow;
 use crate::lua_writer_mode::WriterMode;
-use crate::lua_line::LuaLine;
-use crate::lua_body_sanitizer::LuaBodySanitizer;
 use crate::shadow_lines::ShadowLines;
 
 type Problems = Vec<(usize, &'static str)>;

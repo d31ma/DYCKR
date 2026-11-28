@@ -1,4 +1,6 @@
-use crate::companion_member::{Member, csharp_arguments, csharp_parameters, without_type_first_modifiers};
+use crate::companion_member::{
+    Member, csharp_arguments, csharp_parameters, without_type_first_modifiers,
+};
 use crate::lower_first::lower_first;
 use crate::unicode_name::UnicodeName;
 
@@ -9,7 +11,8 @@ impl FsharpTaskMembers {
     pub const NAMESPACE: &'static str = "System.Threading.Tasks.";
 
     pub fn entry(line: &str) -> Option<(String, String)> {
-        let member = crate::csharp_task_members::CsharpTaskMembers::member(line).or_else(|| Self::value_task(line))?;
+        let member = crate::csharp_task_members::CsharpTaskMembers::member(line)
+            .or_else(|| Self::value_task(line))?;
         let kind = member.declared_type.as_deref().unwrap_or_default();
         let kind = kind.strip_prefix(Self::NAMESPACE).unwrap_or(kind);
         (!Self::EXISTING.contains(&kind))
@@ -17,7 +20,8 @@ impl FsharpTaskMembers {
     }
 
     pub fn name(line: &str) -> Option<String> {
-        let member = crate::csharp_task_members::CsharpTaskMembers::member(line).or_else(|| Self::value_task(line))?;
+        let member = crate::csharp_task_members::CsharpTaskMembers::member(line)
+            .or_else(|| Self::value_task(line))?;
         Some(member.name)
     }
 

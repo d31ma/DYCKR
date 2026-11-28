@@ -14,12 +14,7 @@ impl NodeFailure {
         self.stdout_before_deadline.as_deref()
     }
 
-    pub fn new(
-        description: &str,
-        deadline: Duration,
-        error: ToolError,
-        retried: bool,
-    ) -> Self {
+    pub fn new(description: &str, deadline: Duration, error: ToolError, retried: bool) -> Self {
         let mut failure = Self::explained(description, deadline, error);
         if retried {
             failure.message.push_str(

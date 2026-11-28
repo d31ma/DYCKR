@@ -1,4 +1,4 @@
-use crate::failure::{diagnostic, Failure};
+use crate::failure::{Failure, diagnostic};
 use serde::Serialize;
 use std::fmt::Write as _;
 

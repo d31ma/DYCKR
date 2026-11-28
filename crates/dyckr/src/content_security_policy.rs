@@ -69,7 +69,7 @@ impl ContentSecurityPolicy {
 mod tests {
     use crate::content_security_policy::ContentSecurityPolicy;
     use crate::speculation_rules::SpeculationRules;
-use crate::view_transition_guard::ViewTransitionGuard;
+    use crate::view_transition_guard::ViewTransitionGuard;
 
     #[test]
     pub fn the_server_and_the_native_hosts_allow_the_same_scripts() {

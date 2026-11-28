@@ -1,6 +1,6 @@
 use crate::config_failure::config_failure;
-use crate::xml_escape::xml_escape;
 use crate::failure::Failure;
+use crate::xml_escape::xml_escape;
 use std::collections::BTreeMap;
 use tachyon_contracts::NativeTarget;
 

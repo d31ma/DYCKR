@@ -1,11 +1,11 @@
-use crate::rust_held_fields::RustHeldFields;
-use crate::rust_construction::RustConstruction;
+use crate::companion_failures::unnamed_service;
+use crate::companion_member::rust_struct_fields;
 use crate::companion_syntax::{block_named, blocks};
 use crate::declared_service::declared_service;
-use crate::rust_owner_table::rust_owner_table;
-use crate::companion_member::rust_struct_fields;
-use crate::companion_failures::unnamed_service;
 use crate::failure::Failure;
+use crate::rust_construction::RustConstruction;
+use crate::rust_held_fields::RustHeldFields;
+use crate::rust_owner_table::rust_owner_table;
 use crate::unicode_name::UnicodeName;
 
 pub struct RustGraph;
@@ -82,7 +82,8 @@ impl RustGraph {
         let wanted = declared_service(path, source);
         let (name, body) = block_named(source, "struct", wanted.as_deref())
             .ok_or_else(|| unnamed_service(path, wanted.as_deref(), "struct"))?;
-        let collaborators = crate::rust_collaborators::RustCollaborators::declared_beside(&name, source);
+        let collaborators =
+            crate::rust_collaborators::RustCollaborators::declared_beside(&name, source);
         let has_setters = rust_struct_fields(body)
             .iter()
             .any(|member| !collaborators.holds(member.declared_type.as_deref()));

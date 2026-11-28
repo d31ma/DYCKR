@@ -1,11 +1,11 @@
-use crate::companion_syntax::{block_named, rust_field_declarations};
-use crate::companion_names::camel_case;
-use crate::declared_service::declared_service;
-use crate::companion_member::rust_field;
-use crate::rust_model_type::{rust_read, rust_write};
 use crate::companion_failures::unnamed_service;
+use crate::companion_member::rust_field;
+use crate::companion_names::camel_case;
+use crate::companion_syntax::{block_named, rust_field_declarations};
+use crate::declared_service::declared_service;
 use crate::failure::Failure;
 use crate::failure::{diagnostic, source_span};
+use crate::rust_model_type::{rust_read, rust_write};
 use crate::unicode_name::UnicodeName;
 use std::collections::BTreeSet;
 
@@ -20,11 +20,7 @@ impl RustHeldFields {
     ];
     pub const UNLOCKED: &'static str = ".unwrap_or_else(|error| error.into_inner())";
 
-    pub fn table(
-        source: &str,
-        path: &str,
-        saved: &BTreeSet<String>,
-    ) -> Result<String, Failure> {
+    pub fn table(source: &str, path: &str, saved: &BTreeSet<String>) -> Result<String, Failure> {
         let (name, body) = Self::service(source, path)?;
         let entries = Self::entries(path, body, saved)?;
         Ok(format!(

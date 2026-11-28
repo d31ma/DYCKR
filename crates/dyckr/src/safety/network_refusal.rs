@@ -1,5 +1,5 @@
-use crate::safety::SafetyUtils;
 use crate::failure::{diagnostic, source_span};
+use crate::safety::SafetyUtils;
 use std::ops::Range;
 use std::path::Path;
 use tachyon_diagnostics::Diagnostic;

@@ -1,4 +1,3 @@
-
 pub struct LexicalMask {
     pub code: Vec<bool>,
     pub error: Option<&'static str>,
@@ -23,4 +22,3 @@ impl LexicalMask {
         }
     }
 }
-

@@ -15,4 +15,3 @@ pub struct EventMethod {
     pub return_type: String,
     pub asynchronous: bool,
 }
-

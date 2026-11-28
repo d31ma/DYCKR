@@ -70,7 +70,11 @@ impl TypeText {
         Some(Self::union(extension, &members, depth))
     }
 
-    pub fn read_optional(extension: &str, text: &str, depth: usize) -> Option<Result<Shape, String>> {
+    pub fn read_optional(
+        extension: &str,
+        text: &str,
+        depth: usize,
+    ) -> Option<Result<Shape, String>> {
         let inner = Self::optional_marker(extension, text)
             .or_else(|| Self::generic(text, &Self::OPTIONAL_NAMES))
             .or_else(|| text.strip_suffix('=').filter(|_| extension == "js"))?;
@@ -101,7 +105,11 @@ impl TypeText {
         Some(Self::list_of(extension, inner, depth))
     }
 
-    pub fn read_wrapped(extension: &str, text: &str, depth: usize) -> Option<Result<Shape, String>> {
+    pub fn read_wrapped(
+        extension: &str,
+        text: &str,
+        depth: usize,
+    ) -> Option<Result<Shape, String>> {
         let inner = Self::wrapper(extension, text)?;
         Some(Self::read(extension, &inner, depth + 1))
     }

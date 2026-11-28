@@ -1,4 +1,3 @@
-
 pub fn class_body_named<'a>(source: &'a str, wanted: Option<&str>) -> Option<(String, &'a str)> {
     let Some(wanted) = wanted else {
         return class_body_at(source);

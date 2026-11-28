@@ -1,4 +1,4 @@
-use crate::failure::{diagnostic, source_span, Failure};
+use crate::failure::{Failure, diagnostic, source_span};
 
 pub fn config_failure(message: &str) -> Failure {
     let file_name = "client/manifest.json";

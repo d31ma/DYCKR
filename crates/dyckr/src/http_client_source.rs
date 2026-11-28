@@ -27,7 +27,6 @@ impl ClientClass {
     }
 }
 
-
 pub struct RequestEdit {
     pub marker: String,
     pub blanks: Vec<(Range<usize>, String)>,
@@ -39,40 +38,38 @@ pub const STREAM: &str = "streamrequest";
 pub const SOCKET: &str = "socketrequest";
 pub const CACHE_OPTION_REFUSAL: &str = "@HTTPClient no longer takes \"cache\": its IndexedDB fetch cache was removed (ADR 0087). Mark the class @CacheSettings and each read method @Cached, like Spring's @Cacheable. For reads that work offline, add a rule for the path to tac.cache in client/manifest.json";
 pub const OTHER_ROLES: [&str; 9] = [
-        "service",
-        "store",
-        "delegate",
-        "converter",
-        "setup",
-        "entity",
-        "client",
-        "controller",
-        "requestroute",
-    ];
-
+    "service",
+    "store",
+    "delegate",
+    "converter",
+    "setup",
+    "entity",
+    "client",
+    "controller",
+    "requestroute",
+];
 
 pub const ROLE_SUFFIXES: [&str; 4] = ["Client", "Service", "Store", "Delegate"];
 
 pub const REQUESTS: [(&str, &str, &str); 5] = [
-        ("getrequest", "GET", "GetRequest"),
-        ("postrequest", "POST", "PostRequest"),
-        ("putrequest", "PUT", "PutRequest"),
-        ("patchrequest", "PATCH", "PatchRequest"),
-        ("deleterequest", "DELETE", "DeleteRequest"),
-    ];
+    ("getrequest", "GET", "GetRequest"),
+    ("postrequest", "POST", "PostRequest"),
+    ("putrequest", "PUT", "PutRequest"),
+    ("patchrequest", "PATCH", "PatchRequest"),
+    ("deleterequest", "DELETE", "DeleteRequest"),
+];
 pub const PARAMETERS: [(&str, &str, &str); 4] = [
-        ("pathvariable", "pathVariables", "PathVariable"),
-        ("requestparam", "query", "RequestParam"),
-        ("requestbody", "body", "RequestBody"),
-        ("requestheader", "headers", "RequestHeader"),
-    ];
+    ("pathvariable", "pathVariables", "PathVariable"),
+    ("requestparam", "query", "RequestParam"),
+    ("requestbody", "body", "RequestBody"),
+    ("requestheader", "headers", "RequestHeader"),
+];
 
 pub struct HttpClientSource;
 use std::ops::Range;
 use std::path::Path;
 
 impl HttpClientSource {
-
     pub fn extension(path: &Path) -> &str {
         path.extension()
             .and_then(|value| value.to_str())
@@ -112,7 +109,6 @@ impl HttpClientSource {
     }
 }
 impl HttpClientSource {
-
     pub fn request(name: &str) -> Option<(&'static str, &'static str)> {
         for (marker, verb, written) in crate::http_client_source::REQUESTS {
             if marker == name {
@@ -180,5 +176,4 @@ impl HttpClientSource {
             || name == crate::http_client_source::SOCKET
             || Self::request(&name).is_some()
     }
-
 }

@@ -29,10 +29,7 @@ impl CsharpTaskResult {
     ];
     pub const REFUSAL: &'static str = "A C# browser result is Task or ValueTask of one registered client/models record, a List or array of registered records or plain values, or one plain value (string, int, long, double, float, decimal or bool); maps, nested lists, nullable results and other types are not supported.";
 
-    pub fn model(
-        kind: &str,
-        models: &ModelTable,
-    ) -> Result<Option<CsharpTaskAnswer>, String> {
+    pub fn model(kind: &str, models: &ModelTable) -> Result<Option<CsharpTaskAnswer>, String> {
         Self::require_task(kind.trim())?;
         Self::registered(kind.trim(), models)
     }
@@ -68,8 +65,10 @@ impl CsharpTaskResult {
         let list = Self::list_item(payload);
         let item = array.or(list);
         let single = Self::item(item.unwrap_or(payload), models)?;
-        let forms: [fn(CsharpTaskAnswer, bool) -> CsharpTaskAnswer; 2] =
-            [Self::single, crate::csharp_task_answer::CsharpTaskAnswer::listed];
+        let forms: [fn(CsharpTaskAnswer, bool) -> CsharpTaskAnswer; 2] = [
+            Self::single,
+            crate::csharp_task_answer::CsharpTaskAnswer::listed,
+        ];
         Ok(forms[usize::from(item.is_some())](single, array.is_some()))
     }
 
@@ -91,7 +90,11 @@ impl CsharpTaskResult {
             .find(|(name, _)| *name == item)
             .map_or_else(
                 || Self::record(item, models),
-                |(name, shape)| Ok(crate::csharp_task_answer::CsharpTaskAnswer::value(name, shape)),
+                |(name, shape)| {
+                    Ok(crate::csharp_task_answer::CsharpTaskAnswer::value(
+                        name, shape,
+                    ))
+                },
             )
     }
 
@@ -105,6 +108,8 @@ impl CsharpTaskResult {
         models.check_all()?;
         let schema = models.event_models(name)?;
         crate::csharp_task_shape::CsharpTaskShape::validate(name, &schema)?;
-        Ok(crate::csharp_task_answer::CsharpTaskAnswer::record(name, schema))
+        Ok(crate::csharp_task_answer::CsharpTaskAnswer::record(
+            name, schema,
+        ))
     }
 }

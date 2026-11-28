@@ -1,8 +1,8 @@
 use crate::fsharp_attribute_line::AttributeLine;
 use crate::fsharp_block_kind::BlockKind;
 use crate::fsharp_body::FsharpBody;
-use crate::fsharp_lines::FsharpLines;
 use crate::fsharp_line_kind::LineKind;
+use crate::fsharp_lines::FsharpLines;
 use crate::fsharp_member_header::MemberHeader;
 use crate::fsharp_open_block::OpenBlock;
 use crate::fsharp_record_fields::RecordFields;

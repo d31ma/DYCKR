@@ -10,5 +10,3 @@ impl GatewayLimits {
     pub const MAX_ENTRY_BYTES: usize = 4096;
     pub const MAX_CLASS_PATH_BYTES: usize = 1024;
 }
-
-

@@ -1,12 +1,12 @@
-use crate::model::{Model, ModelField, Record};
-use crate::type_text::TypeText;
-use crate::shape::Shape;
 use crate::cpp_class::CppClass;
 use crate::cpp_file::CppFile;
 use crate::cpp_member::CppMember;
 use crate::cpp_member_kind::CppMemberKind;
 use crate::cpp_source::CppSource;
 use crate::cpp_type_text::CppTypeText;
+use crate::model::{Model, ModelField, Record};
+use crate::shape::Shape;
+use crate::type_text::TypeText;
 use std::path::Path;
 
 pub struct CppYonModels;

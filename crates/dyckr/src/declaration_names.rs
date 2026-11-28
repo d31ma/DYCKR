@@ -1,6 +1,5 @@
-use std::path::Path;
 use crate::failure::Failure;
-
+use std::path::Path;
 
 pub fn declaration_names_source(path: &Path, source: &str) -> Result<Vec<String>, Failure> {
     let code = crate::source_mask::masked_source(path, source)?;
@@ -24,7 +23,11 @@ pub fn declaration_names_source(path: &Path, source: &str) -> Result<Vec<String>
     Ok(names)
 }
 
-pub fn top_level_declaration_name<'a>(extension: &str, line: &'a str, python: bool) -> Option<&'a str> {
+pub fn top_level_declaration_name<'a>(
+    extension: &str,
+    line: &'a str,
+    python: bool,
+) -> Option<&'a str> {
     let trimmed = line.trim_start();
     if extension == "go" {
         return crate::declaration::Declaration::go_name(trimmed);

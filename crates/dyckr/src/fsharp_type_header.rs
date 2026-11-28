@@ -1,6 +1,6 @@
 use crate::fsharp_parameters::FsharpParameters;
-use crate::fsharp_type::FsharpType;
 use crate::fsharp_record_fields::RecordFields;
+use crate::fsharp_type::FsharpType;
 use crate::fsharp_type_form::TypeForm;
 use crate::fsharp_type_name::TypeName;
 

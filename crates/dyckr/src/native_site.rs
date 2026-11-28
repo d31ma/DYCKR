@@ -1,6 +1,6 @@
+use crate::failure::Failure;
 use crate::native_config::{manifest_head, read_manifest};
 use crate::valid_route::valid_route;
-use crate::failure::Failure;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -154,8 +154,9 @@ impl SiteSettings {
     fn validate_source_paths<'a>(
         mut paths: impl Iterator<Item = &'a String>,
     ) -> Result<(), Failure> {
-        paths
-            .try_for_each(|path| crate::style_path::StylePath::validate(path).map_err(config_failure))
+        paths.try_for_each(|path| {
+            crate::style_path::StylePath::validate(path).map_err(config_failure)
+        })
     }
 
     fn validate_origin(origin: Option<&str>) -> Result<(), Failure> {

@@ -1,6 +1,5 @@
 use crate::behavior_module::{Edit, Method, Module, Parameter, Type};
 
-
 pub fn configuration_line(type_declaration: &Type) -> String {
     format!(
         "if (configuration == typeof({})) return {}.configure(execution);\n",
@@ -12,8 +11,6 @@ use serde_json::{Map, Value};
 pub fn quote(value: &str) -> String {
     Value::String(value.to_owned()).to_string()
 }
-
-
 
 pub fn entity_line(type_declaration: &Type, entity: &Value) -> String {
     let mapping = crate::csharp::entity_mapping(type_declaration, entity);
@@ -41,7 +38,6 @@ fn add_partition(entity: &Value, mapping: &mut Value) {
     }
 }
 
-
 pub fn json_arguments(method: &Method) -> String {
     let mut arguments = Vec::new();
     for parameter in &method.parameters {
@@ -49,7 +45,6 @@ pub fn json_arguments(method: &Method) -> String {
     }
     arguments.join(", ")
 }
-
 
 pub fn joined<T>(items: impl IntoIterator<Item = T>, spell: impl Fn(T) -> String) -> String {
     let mut text = String::new();
@@ -95,15 +90,22 @@ pub fn property_entries(unit: &Unit) -> String {
     let Some(entries) = unit.properties.as_object() else {
         return String::new();
     };
-    crate::csharp::joined(crate::sorted_json::SortedJson::entries(entries), |(key, value)| {
-        let name = key.replace('.', "_").to_uppercase();
-        let text = value
-            .as_str()
-            .map_or_else(|| crate::sorted_json::SortedJson::text(value), str::to_owned);
-        format!("[{}] = {}, ", crate::csharp::quote(&name), crate::csharp::quote(&text))
-    })
+    crate::csharp::joined(
+        crate::sorted_json::SortedJson::entries(entries),
+        |(key, value)| {
+            let name = key.replace('.', "_").to_uppercase();
+            let text = value.as_str().map_or_else(
+                || crate::sorted_json::SortedJson::text(value),
+                str::to_owned,
+            );
+            format!(
+                "[{}] = {}, ",
+                crate::csharp::quote(&name),
+                crate::csharp::quote(&text)
+            )
+        },
+    )
 }
-
 
 pub fn is_json(value: &str) -> bool {
     value.trim() == "BehaviorJSON"
@@ -118,9 +120,9 @@ pub fn is_task_json(value: &str) -> bool {
 }
 
 pub fn returns_json_or_task_json(method: &Method) -> bool {
-    crate::csharp::is_json(&method.return_type) || (method.asynchronous && crate::csharp::is_task_json(&method.return_type))
+    crate::csharp::is_json(&method.return_type)
+        || (method.asynchronous && crate::csharp::is_task_json(&method.return_type))
 }
-
 
 pub fn is_validation_only(method: &Method) -> bool {
     method.metadata.len() == 1 && method.metadata.contains_key("valid")
@@ -141,16 +143,15 @@ pub fn uses_invocation(method: &Method) -> bool {
         || method.metadata.contains_key("cachePut")
 }
 
-
 pub fn policy_line(type_declaration: &Type) -> String {
-    let policies = crate::sorted_json::SortedJson::text(&Value::Object(type_declaration.policies.clone()));
+    let policies =
+        crate::sorted_json::SortedJson::text(&Value::Object(type_declaration.policies.clone()));
     format!(
         "if (type == typeof({})) return BehaviorJSON.Parse({});\n",
         type_declaration.name,
         crate::csharp::quote(&policies)
     )
 }
-
 
 pub fn parameter_at<'a>(
     method: &'a Method,
@@ -167,7 +168,6 @@ pub fn parameter_at<'a>(
     method.parameters.get(index).ok_or(out_of_range)
 }
 
-
 pub fn pageable_line(method: &Method, policy: &Value) -> Result<String, String> {
     let parameter = crate::csharp::parameter_at(method, policy, "Pageable")?;
     if !crate::csharp::is_json(&parameter.type_source) {
@@ -180,7 +180,6 @@ pub fn pageable_line(method: &Method, policy: &Value) -> Result<String, String> 
         crate::csharp::quote(&crate::sorted_json::SortedJson::text(policy))
     ))
 }
-
 
 pub fn validation_prefix(method: &Method) -> Result<String, String> {
     let Some(policy) = method.metadata.get("valid") else {
@@ -197,7 +196,6 @@ pub fn validation_prefix(method: &Method) -> Result<String, String> {
         parameter.name
     ))
 }
-
 
 pub fn gateway_body(method: &Method, policy: &Value) -> String {
     let key = policy["key"].as_str().unwrap_or_default();
@@ -254,7 +252,6 @@ pub fn query_body(method: &Method, query: &Value) -> Result<String, String> {
     ))
 }
 
-
 pub fn written_body(method: &Method) -> Result<Option<String>, String> {
     if let Some(policy) = method.metadata.get("gateway") {
         return Ok(Some(crate::csharp::gateway_body(method, policy)));
@@ -267,7 +264,6 @@ pub fn written_body(method: &Method) -> Result<Option<String>, String> {
     }
     Ok(None)
 }
-
 
 pub fn validation_only_body(method: &Method, prefix: &str, body: &str) -> Result<String, String> {
     if !crate::csharp::returns_json_or_task_json(method) {
@@ -293,8 +289,10 @@ pub fn invocation_body(
     ))
 }
 
-
-pub fn constructor_parameters(type_declaration: &Type, fields: &[String]) -> Result<String, String> {
+pub fn constructor_parameters(
+    type_declaration: &Type,
+    fields: &[String],
+) -> Result<String, String> {
     let mut parameters = Vec::new();
     for name in fields {
         let Some(field) = type_declaration
@@ -310,7 +308,6 @@ pub fn constructor_parameters(type_declaration: &Type, fields: &[String]) -> Res
     }
     Ok(parameters.join(", "))
 }
-
 
 pub fn declared_exchange(
     type_declaration: &Type,
@@ -328,7 +325,6 @@ pub fn declared_exchange(
     ))
 }
 
-
 pub fn method_body(
     type_declaration: &Type,
     method: &Method,
@@ -336,9 +332,7 @@ pub fn method_body(
     body: &str,
     exchange_body: &dyn Fn(&Type, &Method, &str) -> Option<String>,
 ) -> Result<String, String> {
-    if let Some(body) =
-        exchange_body(type_declaration, method, prefix)
-    {
+    if let Some(body) = exchange_body(type_declaration, method, prefix) {
         return Ok(body);
     }
     if crate::csharp::is_validation_only(method) {
@@ -357,7 +351,6 @@ pub fn method_body(
         "\n{prefix}return this.behaviors.Paginate(() => {{ {body} }});\n"
     ))
 }
-
 
 pub fn constructor_edit(type_declaration: &Type, fields: &[String]) -> Result<Edit, String> {
     let parameters = crate::csharp::constructor_parameters(type_declaration, fields)?;
@@ -413,7 +406,8 @@ pub fn lower_methods(
             prefix.push_str(&crate::csharp::pageable_line(method, policy)?);
         }
         let body = &module.source[method.body.clone()];
-        let replacement = crate::csharp::method_body(type_declaration, method, &prefix, body, exchange_body)?;
+        let replacement =
+            crate::csharp::method_body(type_declaration, method, &prefix, body, exchange_body)?;
         edits.push(Edit {
             range: method.body.clone(),
             replacement: crate::polyglot::block(method, &replacement),
@@ -440,7 +434,6 @@ impl CsharpErrorBody {
 
 use crate::behavior_unit::Unit;
 
-
 pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) -> String {
     let (report, answer) = if environment == "tac" {
         ("string", "report.ToString()")
@@ -452,10 +445,14 @@ pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) 
     };
     let names = crate::csharp::case_names(calls);
     let dispatch = crate::csharp::joined(calls.iter().cloned(), |(name, call)| {
-        format!("case {}: RunCaseBody(() => {call}); return;", crate::csharp::quote(&name))
+        format!(
+            "case {}: RunCaseBody(() => {call}); return;",
+            crate::csharp::quote(&name)
+        )
     });
     let context = crate::csharp::test_context(unit);
-    let cleared_fakes = crate::csharp::joined(&unit.mocks, |name| format!("this.{name} = default;\n"));
+    let cleared_fakes =
+        crate::csharp::joined(&unit.mocks, |name| format!("this.{name} = default;\n"));
     format!(
         "\npublic BehaviorContext behaviors;\n\
          public void startBehaviors() {{ stopBehaviors(); this.behaviors = {context}; }}\n\
@@ -483,13 +480,18 @@ pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) 
     )
 }
 
-
 pub type RuntimeWriter = dyn Fn(&str, &str, &str, &str, &str, &str) -> String;
 pub type TestBlockWriter = dyn Fn(&Module, &Type, &Unit) -> String;
 pub type UnitHelper = dyn Fn(&Module) -> &'static str;
 pub type ExchangeBody = dyn Fn(&Type, &Method, &str) -> Option<String>;
 
-pub fn lower(module: &Module, runtime: &RuntimeWriter, test_block: &TestBlockWriter, unit_helper: &UnitHelper, exchange_body: &ExchangeBody) -> Result<String, String> {
+pub fn lower(
+    module: &Module,
+    runtime: &RuntimeWriter,
+    test_block: &TestBlockWriter,
+    unit_helper: &UnitHelper,
+    exchange_body: &ExchangeBody,
+) -> Result<String, String> {
     let mut edits = Vec::new();
     let mut registrations = Map::new();
     let mut configurations = String::new();
@@ -513,7 +515,8 @@ pub fn lower(module: &Module, runtime: &RuntimeWriter, test_block: &TestBlockWri
                 replacement: test_block(module, type_declaration, &unit),
             });
         }
-        let methods = crate::csharp::lower_methods(module, type_declaration, &mut edits, exchange_body)?;
+        let methods =
+            crate::csharp::lower_methods(module, type_declaration, &mut edits, exchange_body)?;
         registrations.insert(
             type_declaration.name.clone(),
             serde_json::json!({"cache": type_declaration.cache, "methods": methods}),
@@ -541,13 +544,15 @@ pub fn runtime(
     policies: &str,
     sources: &[&str],
 ) -> String {
-    sources.concat()
-    .replace("__TAC_BEHAVIOR_MODULE__", &crate::csharp::quote(module_id))
-    .replace("__TAC_BEHAVIOR_ENVIRONMENT__", &crate::csharp::quote(environment))
-    .replace("__TAC_BEHAVIOR_REGISTRY__", &crate::csharp::quote(registry))
-    .replace("__TAC_BEHAVIOR_CONFIGURATIONS__", configurations)
-    .replace("__TAC_BEHAVIOR_ENTITIES__", entities)
-    .replace("__TAC_BEHAVIOR_TYPES__", policies)
+    sources
+        .concat()
+        .replace("__TAC_BEHAVIOR_MODULE__", &crate::csharp::quote(module_id))
+        .replace(
+            "__TAC_BEHAVIOR_ENVIRONMENT__",
+            &crate::csharp::quote(environment),
+        )
+        .replace("__TAC_BEHAVIOR_REGISTRY__", &crate::csharp::quote(registry))
+        .replace("__TAC_BEHAVIOR_CONFIGURATIONS__", configurations)
+        .replace("__TAC_BEHAVIOR_ENTITIES__", entities)
+        .replace("__TAC_BEHAVIOR_TYPES__", policies)
 }
-
-

@@ -1,14 +1,14 @@
-    pub fn with_fsharp_attributes(mut text: String, rules: &[&'static str]) -> String {
-        for name in rules {
-            let csharp = format!("[{}]", name);
-            text = text.replace(&csharp, &format!("[<{}>]", name));
-        }
-        text
+pub fn with_fsharp_attributes(mut text: String, rules: &[&'static str]) -> String {
+    for name in rules {
+        let csharp = format!("[{}]", name);
+        text = text.replace(&csharp, &format!("[<{}>]", name));
     }
+    text
+}
 
-use std::path::{Path, PathBuf};
 use crate::failure::Failure;
 use crate::fsharp_shadow::FsharpShadow;
+use std::path::{Path, PathBuf};
 use tachyon_diagnostics::{Diagnostic, SourceSpan};
 
 pub struct FsharpView {
@@ -149,7 +149,9 @@ impl FsharpView {
     }
 
     pub fn with_fsharp_attributes(text: String) -> String {
-        let rules: Vec<&'static str> = crate::annotation_rule::AnnotationRules::rules().map(|rule| rule.name).collect();
+        let rules: Vec<&'static str> = crate::annotation_rule::AnnotationRules::rules()
+            .map(|rule| rule.name)
+            .collect();
         crate::fsharp_view::with_fsharp_attributes(text, &rules)
     }
 
@@ -179,4 +181,3 @@ impl FsharpView {
         u64::try_from(self.source_at(offset)).unwrap_or(u64::MAX)
     }
 }
-

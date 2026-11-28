@@ -95,4 +95,3 @@ impl Yard {
         AsciiName::leading(text.trim_start())
     }
 }
-

@@ -158,4 +158,3 @@ impl Declaration {
 pub fn is_identifier_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric() || byte == b'_'
 }
-

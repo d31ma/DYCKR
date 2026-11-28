@@ -1,6 +1,5 @@
 use std::fmt::Write as _;
 
-
 pub fn swift_constructor(fields: &[(String, String)]) -> String {
     let mut constructor = String::from("\ninit?(tacProps: [String: Any]) {\n");
     for (name, kind) in fields {

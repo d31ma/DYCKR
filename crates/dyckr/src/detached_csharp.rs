@@ -1,61 +1,68 @@
 use crate::behavior_module::{Method, Module, Type};
 use crate::planned_method::PlannedMethod;
-use crate::polyglot_unit::polyglot_unit;
 use crate::planned_type::PlannedType;
+use crate::polyglot_unit::polyglot_unit;
 use crate::sorted_json::SortedJson;
 use serde_json::{Map, Value};
 
-
 pub fn quote(value: &str) -> String {
-        Value::String(value.to_owned()).to_string()
-    }
+    Value::String(value.to_owned()).to_string()
+}
 
 pub fn named_line(parameter: &str, name: &str, value: &Value) -> String {
-        format!(
-            "if ({parameter}.Name == {}) return BehaviorJSON.Parse({});\n",
-            crate::detached_csharp::quote(name),
-            crate::detached_csharp::quote(&SortedJson::text(value))
-        )
-    }
+    format!(
+        "if ({parameter}.Name == {}) return BehaviorJSON.Parse({});\n",
+        crate::detached_csharp::quote(name),
+        crate::detached_csharp::quote(&SortedJson::text(value))
+    )
+}
 
 pub fn registered(type_declaration: &Type) -> Map<String, Value> {
-        type_declaration
-            .methods
-            .iter()
-            .filter(|method| crate::detached_csharp::invoked(method))
-            .map(|method| (method.name.clone(), Value::Object(method.metadata.clone())))
-            .collect()
-    }
+    type_declaration
+        .methods
+        .iter()
+        .filter(|method| crate::detached_csharp::invoked(method))
+        .map(|method| (method.name.clone(), Value::Object(method.metadata.clone())))
+        .collect()
+}
 
 pub fn invoked(method: &Method) -> bool {
-        let written = crate::detached_csharp_consts::WRITTEN_BODIES
-            .iter()
-            .any(|key| method.metadata.contains_key(*key));
-        [method.metadata.is_empty(), written] == [false, false]
-    }
+    let written = crate::detached_csharp_consts::WRITTEN_BODIES
+        .iter()
+        .any(|key| method.metadata.contains_key(*key));
+    [method.metadata.is_empty(), written] == [false, false]
+}
 
 pub fn configured(runtime: &str) -> String {
-        runtime.replacen(
-            crate::detached_csharp_consts::CONFIGURE,
-            &format!("{}{}", crate::detached_csharp_consts::CONFIGURATIONS_FIELD, crate::detached_csharp_consts::CONFIGURE),
-            1,
-        )
-    }
+    runtime.replacen(
+        crate::detached_csharp_consts::CONFIGURE,
+        &format!(
+            "{}{}",
+            crate::detached_csharp_consts::CONFIGURATIONS_FIELD,
+            crate::detached_csharp_consts::CONFIGURE
+        ),
+        1,
+    )
+}
 
 pub fn policies(module: &Module) -> String {
-        module.types.iter().map(crate::detached_csharp::policy_line).collect()
-    }
+    module
+        .types
+        .iter()
+        .map(crate::detached_csharp::policy_line)
+        .collect()
+}
 
 pub fn policy_line(type_declaration: &Type) -> String {
-        crate::detached_csharp::named_line(
-            "type",
-            &type_declaration.name,
-            &Value::Object(type_declaration.policies.clone()),
-        )
-    }
+    crate::detached_csharp::named_line(
+        "type",
+        &type_declaration.name,
+        &Value::Object(type_declaration.policies.clone()),
+    )
+}
 
 pub fn registry(module: &Module) -> String {
-        let registrations: Map<String, Value> = module
+    let registrations: Map<String, Value> = module
             .types
             .iter()
             .map(|type_declaration| {
@@ -65,45 +72,51 @@ pub fn registry(module: &Module) -> String {
                 )
             })
             .collect();
-        SortedJson::text(&Value::Object(registrations))
-    }
+    SortedJson::text(&Value::Object(registrations))
+}
 
 pub fn storage(module: &Module) -> &'static str {
-        let tac = module.environment == crate::detached_csharp_consts::TAC;
-        [crate::detached_csharp_consts::NO_STORAGE, crate::detached_csharp_consts::PAGE_STORAGE][usize::from(tac)]
-    }
+    let tac = module.environment == crate::detached_csharp_consts::TAC;
+    [
+        crate::detached_csharp_consts::NO_STORAGE,
+        crate::detached_csharp_consts::PAGE_STORAGE,
+    ][usize::from(tac)]
+}
 
 pub fn mapped_argument(method: &Method) -> Option<usize> {
-        let policy = method.metadata.get("mapping")?;
-        crate::mapper::plan(policy).ok().map(|(argument, _)| argument)
-    }
+    let policy = method.metadata.get("mapping")?;
+    crate::mapper::plan(policy)
+        .ok()
+        .map(|(argument, _)| argument)
+}
 
 pub fn types(module: &Module) -> Vec<PlannedType> {
-        module
-            .types
-            .iter()
-            .map(|type_declaration| PlannedType {
-                name: type_declaration.name.clone(),
-                line: crate::detached_csharp::line(module, type_declaration.keyword.start),
-                declared: type_declaration.declared,
-                takes_context: crate::detached_csharp::takes_context(type_declaration),
-            })
-            .collect()
-    }
+    module
+        .types
+        .iter()
+        .map(|type_declaration| PlannedType {
+            name: type_declaration.name.clone(),
+            line: crate::detached_csharp::line(module, type_declaration.keyword.start),
+            declared: type_declaration.declared,
+            takes_context: crate::detached_csharp::takes_context(type_declaration),
+        })
+        .collect()
+}
 
 pub fn takes_context(type_declaration: &Type) -> bool {
-        type_declaration
-            .constructor
-            .as_ref()
-            .is_some_and(|fields| fields.iter().any(|field| field == crate::detached_csharp_consts::CONTEXT))
-    }
+    type_declaration.constructor.as_ref().is_some_and(|fields| {
+        fields
+            .iter()
+            .any(|field| field == crate::detached_csharp_consts::CONTEXT)
+    })
+}
 
 pub fn line(module: &Module, offset: usize) -> usize {
-        module
-            .source
-            .get(..offset)
-            .map_or(0, |before| before.matches('\n').count())
-    }
+    module
+        .source
+        .get(..offset)
+        .map_or(0, |before| before.matches('\n').count())
+}
 pub struct DetachedCsharp {
     pub lowered: String,
     pub runtime: String,
@@ -114,7 +127,6 @@ pub struct DetachedCsharp {
 }
 
 impl DetachedCsharp {
-
     pub fn with_lowered(self, lowered: String) -> DetachedCsharp {
         DetachedCsharp { lowered, ..self }
     }
@@ -131,12 +143,14 @@ impl DetachedCsharp {
     }
 
     pub fn without_page_storage(self) -> DetachedCsharp {
-        let setups = self.setups.replace(crate::detached_csharp_consts::PAGE_STORAGE, crate::detached_csharp_consts::NO_STORAGE);
+        let setups = self.setups.replace(
+            crate::detached_csharp_consts::PAGE_STORAGE,
+            crate::detached_csharp_consts::NO_STORAGE,
+        );
         DetachedCsharp { setups, ..self }
     }
 }
 impl crate::detached_csharp::DetachedCsharp {
-
     pub fn test_context(module: &Module) -> String {
         module
             .types
@@ -153,7 +167,11 @@ impl crate::detached_csharp::DetachedCsharp {
     pub fn entity_line(type_declaration: &Type) -> Option<String> {
         let entity = type_declaration.entity.as_ref()?;
         let mapping = crate::csharp::entity_mapping(type_declaration, entity);
-        Some(crate::detached_csharp::named_line("entity", &type_declaration.name, &mapping))
+        Some(crate::detached_csharp::named_line(
+            "entity",
+            &type_declaration.name,
+            &mapping,
+        ))
     }
 
     pub fn setups(module: &Module) -> String {
@@ -186,7 +204,11 @@ impl crate::detached_csharp::DetachedCsharp {
             .collect()
     }
 
-    pub fn planned_method(module: &Module, type_declaration: &Type, method: &Method) -> PlannedMethod {
+    pub fn planned_method(
+        module: &Module,
+        type_declaration: &Type,
+        method: &Method,
+    ) -> PlannedMethod {
         PlannedMethod {
             owner: type_declaration.name.clone(),
             name: method.name.clone(),
@@ -205,7 +227,11 @@ impl crate::detached_csharp::DetachedCsharp {
 }
 
 impl crate::detached_csharp::DetachedCsharp {
-    pub fn of_with(module: &Module, lower: &dyn Fn(&Module) -> Result<String, String>, runtime: &crate::csharp::RuntimeWriter) -> Result<Self, String> {
+    pub fn of_with(
+        module: &Module,
+        lower: &dyn Fn(&Module) -> Result<String, String>,
+        runtime: &crate::csharp::RuntimeWriter,
+    ) -> Result<Self, String> {
         let lowered = lower(module)?;
         Ok(Self {
             lowered,
@@ -217,7 +243,10 @@ impl crate::detached_csharp::DetachedCsharp {
         })
     }
 
-    pub fn page_socket_runtime_with(path: &std::path::Path, runtime: &crate::csharp::RuntimeWriter) -> String {
+    pub fn page_socket_runtime_with(
+        path: &std::path::Path,
+        runtime: &crate::csharp::RuntimeWriter,
+    ) -> String {
         let module_id = crate::module_id::module_id(path);
         crate::detached_csharp::configured(&runtime(
             &module_id,

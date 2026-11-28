@@ -59,7 +59,8 @@ impl Role {
             return crate::role::Role::beneath(parent, "server/controllers");
         }
         if self.folder == "remotes"
-            && (crate::role::Role::beneath(parent, "client/clients") || crate::role::Role::beneath(parent, "server/clients"))
+            && (crate::role::Role::beneath(parent, "client/clients")
+                || crate::role::Role::beneath(parent, "server/clients"))
         {
             return true;
         }

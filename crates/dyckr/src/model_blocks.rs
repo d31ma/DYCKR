@@ -3,9 +3,9 @@ use crate::model_blocks::braced_blocks::BracedBlocks;
 use crate::model_blocks::js_doc_blocks::JsDocBlocks;
 use crate::model_blocks::leading_lines::LeadingLines;
 use crate::model_blocks::line_blocks::LineBlocks;
+pub use crate::model_blocks::string_fill::StringFill;
 use std::ffi::OsStr;
 use std::path::Path;
-pub use crate::model_blocks::string_fill::StringFill;
 
 mod braced_blocks;
 mod js_doc_blocks;
@@ -30,10 +30,7 @@ impl ModelBlocks {
         Self::captured(path, source, Self::model_path(path))
     }
 
-    pub fn schema_declarations(
-        path: &Path,
-        source: &str,
-    ) -> Result<Vec<ModelBlock>, Failure> {
+    pub fn schema_declarations(path: &Path, source: &str) -> Result<Vec<ModelBlock>, Failure> {
         Self::captured(path, source, true)
     }
 

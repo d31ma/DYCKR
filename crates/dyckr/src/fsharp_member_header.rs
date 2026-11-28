@@ -1,11 +1,11 @@
 use crate::fsharp_body::FsharpBody;
-use crate::fsharp_parameters::FsharpParameters;
-use crate::fsharp_type::FsharpType;
-use crate::fsharp_value::FsharpValue;
 use crate::fsharp_member_line::MemberLine;
 use crate::fsharp_member_words::MemberWords;
+use crate::fsharp_parameters::FsharpParameters;
+use crate::fsharp_type::FsharpType;
 use crate::fsharp_type_form::TypeForm;
 use crate::fsharp_type_header::TypeHeader;
+use crate::fsharp_value::FsharpValue;
 
 pub struct MemberHeader {
     pub text: String,

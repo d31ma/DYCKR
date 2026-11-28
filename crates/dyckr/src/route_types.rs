@@ -1,6 +1,6 @@
+pub use crate::model::{Model, ModelField, Record};
 use crate::plan::{ParameterSource, Route};
 pub use crate::shape::Shape;
-pub use crate::model::{Model, ModelField, Record};
 use serde_json::{Map, Value, json};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -11,14 +11,13 @@ pub mod rust_model_traversal;
 pub mod rust_tac_models;
 pub use rust_tac_models::RustTacModels;
 
-pub use mapping_models::MappingModels;
-pub use model_files::RustField;
 pub use crate::php_doc::PhpDoc;
 pub use crate::type_text::TypeText;
 pub use crate::web_event_models::WebEventModels;
 pub use crate::web_event_sender::WebEventSender;
 pub use crate::web_event_sources::WebEventSources;
-
+pub use mapping_models::MappingModels;
+pub use model_files::RustField;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ModelTable {
@@ -29,7 +28,8 @@ pub struct ModelTable {
 
 impl ModelTable {
     pub const MAX_DEPTH: usize = 32;
-    pub const REQUEST_BOUND: [&'static str; 5] = ["Request", "Context", "FileHeader", "File", "Form"];
+    pub const REQUEST_BOUND: [&'static str; 5] =
+        ["Request", "Context", "FileHeader", "File", "Form"];
     pub const REQUEST_BOUND_HINT: &'static str = ". A request, its context or an uploaded file is not JSON data, so it cannot be a model field (ADR 0043): read it from the native request parameter of the route method, or keep the field out of JSON (in Go, tag it `json:\"-\"`)";
 
     pub fn read(root: &Path, extension: &str) -> Result<Self, String> {
@@ -199,11 +199,7 @@ impl ModelTable {
         Ok(Value::Object(described))
     }
 
-    pub fn shape_description(
-        &self,
-        shape: &Shape,
-        described: &mut Map<String, Value>,
-    ) -> String {
+    pub fn shape_description(&self, shape: &Shape, described: &mut Map<String, Value>) -> String {
         let mut waiting = Vec::new();
         let text = self.shape_text(shape, &mut waiting, 0);
         described.extend(self.models_of(&waiting));

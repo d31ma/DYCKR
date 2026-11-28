@@ -22,4 +22,3 @@ impl EventListener {
     pub const OPTION_KEYS: [&str; 3] = ["replay", "condition", "id"];
     pub const NAMED_EVENT_REFUSAL: &str = "OnEvent takes no event names: the model type of the payload parameter is the event (ADR 0055). Write @OnEvent and give the parameter a model type, for example placed(OrderPlaced order). `ty migrate fix --write` converts a listener whose event name matches a model";
 }
-

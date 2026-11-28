@@ -63,4 +63,3 @@ pub struct Module {
     pub types: Vec<Type>,
     pub edits: Vec<Edit>,
 }
-

@@ -33,4 +33,3 @@ impl Marker {
         ("MockitoSpyBean", Self::SPY_ADVICE),
     ];
 }
-

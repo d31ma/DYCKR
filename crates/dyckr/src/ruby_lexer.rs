@@ -429,4 +429,3 @@ impl<'a> RubyLexer<'a> {
         None
     }
 }
-

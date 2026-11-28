@@ -11,4 +11,3 @@ pub struct PlannedMethod {
     pub asynchronous: bool,
     pub mapped_argument: Option<usize>,
 }
-

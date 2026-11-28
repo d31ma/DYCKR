@@ -1,6 +1,6 @@
+use crate::failure::Failure;
 use serde::Serialize;
 use std::path::Path;
-use crate::failure::Failure;
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct EventType {
@@ -18,6 +18,10 @@ pub struct EventType {
 pub fn failure(path: &Path, at: usize, message: impl Into<String>) -> Failure {
     let help = "Use own-line OnEvent, OnStart and OnStop annotations on named instance members, and @Needs on a field named after the resource it takes.";
     let span = crate::failure::source_span(&path.to_string_lossy(), at, at.saturating_add(1));
-    Failure::one(crate::failure::diagnostic(1308, message, Some(help.into()), span))
+    Failure::one(crate::failure::diagnostic(
+        1308,
+        message,
+        Some(help.into()),
+        span,
+    ))
 }
-

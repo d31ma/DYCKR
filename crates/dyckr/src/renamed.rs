@@ -232,4 +232,3 @@ impl RoutingRename {
         Self::snake_case(new)
     }
 }
-

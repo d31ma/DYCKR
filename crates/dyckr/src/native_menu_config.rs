@@ -1,6 +1,6 @@
+use crate::failure::Failure;
 use crate::native_menu_entry::NativeMenuEntry;
 use crate::native_route_index::NativeRouteIndex;
-use crate::failure::Failure;
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
@@ -71,7 +71,9 @@ impl NativeMenuConfig {
         (self.items().count() <= Self::MAX_ITEMS)
             .then_some(())
             .ok_or_else(|| {
-                crate::config_failure::config_failure("Native menus may declare at most 64 items in total.")
+                crate::config_failure::config_failure(
+                    "Native menus may declare at most 64 items in total.",
+                )
             })
     }
 
@@ -132,7 +134,10 @@ impl NativeMenuConfig {
             })
     }
 
-    pub fn require_document(item: &NativeMenuEntry, index: &NativeRouteIndex) -> Result<(), Failure> {
+    pub fn require_document(
+        item: &NativeMenuEntry,
+        index: &NativeRouteIndex,
+    ) -> Result<(), Failure> {
         item.route
             .as_deref()
             .map_or(Ok(()), |route| Self::require_page(&item.id, route, index))

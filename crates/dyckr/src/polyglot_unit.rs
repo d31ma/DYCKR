@@ -1,6 +1,5 @@
 use crate::behavior_unit::Unit;
 
-
 pub fn polyglot_unit(ty: &crate::behavior_module::Type) -> Option<Unit> {
     let declared = ty.policies.get("test")?.as_object()?;
     let configuration = declared.get("configuration")?.as_str()?.to_owned();

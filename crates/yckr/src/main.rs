@@ -20,29 +20,53 @@ struct Product {
 }
 
 const PRODUCTS: [Product; 3] = [
-    Product { flag: "kw", repo: "KWYCKR", engine: "kwyckr" },
-    Product { flag: "k", repo: "KYCKR", engine: "kyckr" },
-    Product { flag: "b", repo: "BYCKR", engine: "byckr" },
+    Product {
+        flag: "kw",
+        repo: "KWYCKR",
+        engine: "kwyckr",
+    },
+    Product {
+        flag: "k",
+        repo: "KYCKR",
+        engine: "kyckr",
+    },
+    Product {
+        flag: "b",
+        repo: "BYCKR",
+        engine: "byckr",
+    },
 ];
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
-    let Some(product) = PRODUCTS.iter().find(|p| args.iter().any(|a| a == &format!("--{}", p.flag))) else {
+    let Some(product) = PRODUCTS
+        .iter()
+        .find(|p| args.iter().any(|a| a == &format!("--{}", p.flag)))
+    else {
         eprintln!("usage: yckr --kw|--k|--b [--<flag>-version <version>] <args…>");
         return ExitCode::from(2);
     };
 
     let version = match requested_version(&args, product) {
         Ok(v) => v,
-        Err(e) => { eprintln!("yckr: {e}"); return ExitCode::from(2); }
+        Err(e) => {
+            eprintln!("yckr: {e}");
+            return ExitCode::from(2);
+        }
     };
     let version = match resolve_version(product, &version) {
         Ok(v) => v,
-        Err(e) => { eprintln!("yckr: {e}"); return ExitCode::from(1); }
+        Err(e) => {
+            eprintln!("yckr: {e}");
+            return ExitCode::from(1);
+        }
     };
     let bin = match engine_binary(product, &version) {
         Ok(p) => p,
-        Err(e) => { eprintln!("yckr: {e}"); return ExitCode::from(1); }
+        Err(e) => {
+            eprintln!("yckr: {e}");
+            return ExitCode::from(1);
+        }
     };
 
     let rest: Vec<String> = args
@@ -50,14 +74,18 @@ fn main() -> ExitCode {
         .filter(|a| {
             a != &format!("--{}", product.flag)
                 && !(a.starts_with(&format!("--{}-version", product.flag))
-                    || a == "--version" || a == "-v")
+                    || a == "--version"
+                    || a == "-v")
         })
         .collect();
 
     match Command::new(&bin).args(rest).status() {
         Ok(status) if status.success() => ExitCode::SUCCESS,
         Ok(status) => ExitCode::from(status.code().unwrap_or(1) as u8),
-        Err(error) => { eprintln!("yckr: cannot run {}: {error}", bin.display()); ExitCode::from(1) }
+        Err(error) => {
+            eprintln!("yckr: cannot run {}: {error}", bin.display());
+            ExitCode::from(1)
+        }
     }
 }
 
@@ -66,7 +94,10 @@ fn requested_version(args: &[String], product: &Product) -> Result<String, Strin
     let mut iter = args.iter();
     while let Some(arg) = iter.next() {
         if arg == &key {
-            return iter.next().cloned().ok_or_else(|| format!("{key} needs a value"));
+            return iter
+                .next()
+                .cloned()
+                .ok_or_else(|| format!("{key} needs a value"));
         }
     }
     let env_key = format!("YCKR_{}_VERSION", product.flag.to_uppercase());
@@ -77,7 +108,10 @@ fn resolve_version(product: &Product, requested: &str) -> Result<String, String>
     if requested == "latest" {
         let url = format!("{GITHUB}/{}/releases/latest", product.repo);
         let response = ureq::get(&url).call().map_err(|e| format!("{url}: {e}"))?;
-        let body = response.into_body().read_to_string().map_err(|e| e.to_string())?;
+        let body = response
+            .into_body()
+            .read_to_string()
+            .map_err(|e| e.to_string())?;
         let value: serde_json::Value = serde_json::from_str(&body).map_err(|e| e.to_string())?;
         value["tag_name"]
             .as_str()
@@ -105,7 +139,9 @@ fn engine_binary(product: &Product, version: &str) -> Result<PathBuf, String> {
     let expected = expected.trim();
     let actual = hex(&Sha256::digest(&body));
     if actual != expected {
-        return Err(format!("{asset}: SHA-256 mismatch (expected {expected}, got {actual})"));
+        return Err(format!(
+            "{asset}: SHA-256 mismatch (expected {expected}, got {actual})"
+        ));
     }
     fs::write(&bin, &body).map_err(|e| format!("{}: {e}", bin.display()))?;
     #[cfg(unix)]
@@ -118,7 +154,10 @@ fn engine_binary(product: &Product, version: &str) -> Result<PathBuf, String> {
 
 fn download(url: &str) -> Result<Vec<u8>, String> {
     let response = ureq::get(url).call().map_err(|e| format!("{url}: {e}"))?;
-    response.into_body().read_to_vec().map_err(|e| format!("{url}: {e}"))
+    response
+        .into_body()
+        .read_to_vec()
+        .map_err(|e| format!("{url}: {e}"))
 }
 
 fn cache_dir(product: &Product, version: &str) -> PathBuf {

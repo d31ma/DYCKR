@@ -1,5 +1,3 @@
-
-
 pub fn declared_service(source_path: &str, source: &str) -> Option<String> {
     let path = source_path.replace('\\', "/");
     let (parent, file) = path.rsplit_once('/')?;
@@ -21,8 +19,10 @@ pub fn declared_service(source_path: &str, source: &str) -> Option<String> {
         crate::declaration_names::declaration_names_source(std::path::Path::new(&path), source)
             .ok()?
             .into_iter()
-            .find(|name| crate::class_file_name::class_file_matches(std::path::Path::new(&path), name))
-        .filter(|name| name.ends_with("Service"))
-        .unwrap_or_else(|| stem.to_owned()),
+            .find(|name| {
+                crate::class_file_name::class_file_matches(std::path::Path::new(&path), name)
+            })
+            .filter(|name| name.ends_with("Service"))
+            .unwrap_or_else(|| stem.to_owned()),
     )
 }

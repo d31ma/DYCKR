@@ -1,6 +1,5 @@
 use crate::behavior_module::{Edit, Field, Method, Module, Type};
 
-
 pub fn block(method: &Method, body: &str) -> String {
     if method.declared {
         format!(" {{ {body} }}")
@@ -9,11 +8,7 @@ pub fn block(method: &Method, body: &str) -> String {
     }
 }
 
-pub fn render(
-    module: &Module,
-    mut edits: Vec<Edit>,
-    suffix: &str,
-) -> Result<String, String> {
+pub fn render(module: &Module, mut edits: Vec<Edit>, suffix: &str) -> Result<String, String> {
     edits.extend(module.edits.iter().cloned());
     edits.sort_by_key(|edit| std::cmp::Reverse((edit.range.start, edit.range.end)));
     let mut previous_start = module.source.len();
@@ -44,7 +39,6 @@ pub fn declared_fields(ty: &Type, spell: impl Fn(&Field) -> String) -> String {
     }
     output
 }
-
 
 pub fn concrete_edit(module: &Module, ty: &Type) -> Option<Edit> {
     if !ty.declared || matches!(module.language.as_str(), "rs" | "go") {

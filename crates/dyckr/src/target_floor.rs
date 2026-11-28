@@ -1,5 +1,5 @@
-use crate::system_version::SystemVersion;
 use crate::failure::Failure;
+use crate::system_version::SystemVersion;
 use std::collections::BTreeSet;
 use tachyon_contracts::NativeTarget;
 

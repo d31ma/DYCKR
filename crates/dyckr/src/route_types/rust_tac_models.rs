@@ -1,9 +1,9 @@
 use crate::declarations::Declarations;
+use crate::failure::Failure;
+use crate::failure::{diagnostic, source_span};
 use crate::route_types::model_files::ModelParser;
 use crate::route_types::rust_model_traversal::RustModelTraversal;
 use crate::route_types::{Model, ModelTable, RustField, WebEventModels};
-use crate::failure::Failure;
-use crate::failure::{diagnostic, source_span};
 use std::fmt::Write as _;
 use std::path::Path;
 
@@ -262,8 +262,7 @@ impl RustTacModels {
     }
 
     fn alias(source: &str, name: &str) -> Option<String> {
-        let code =
-            crate::source_mask::masked_source(Path::new(Self::MASK_PATH), source).ok()?;
+        let code = crate::source_mask::masked_source(Path::new(Self::MASK_PATH), source).ok()?;
         code.match_indices(Self::ALIAS_KEYWORD)
             .find_map(|(at, _)| Self::alias_statement(&code, at, name))
     }
@@ -405,8 +404,7 @@ impl RustTacModels {
     }
 
     fn enum_info(source: &str, name: &str) -> Option<(Vec<String>, std::ops::Range<usize>)> {
-        let code =
-            crate::source_mask::masked_source(Path::new(Self::MASK_PATH), source).ok()?;
+        let code = crate::source_mask::masked_source(Path::new(Self::MASK_PATH), source).ok()?;
         let header = format!("{}{name}", Self::ENUM_PREFIX);
         let (at, _) = code
             .match_indices(&header)

@@ -1,4 +1,3 @@
-
 pub fn expression_can_start(prefix: &[u8]) -> bool {
     let Some(last) = prefix.iter().rposition(|byte| !byte.is_ascii_whitespace()) else {
         return true;

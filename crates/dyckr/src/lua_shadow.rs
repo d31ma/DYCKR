@@ -1,5 +1,5 @@
-use crate::lua_shadow_writer::ShadowWriter;
 use crate::lua_body_sanitizer::LuaBodySanitizer;
+use crate::lua_shadow_writer::ShadowWriter;
 use crate::shadow_lines::ShadowLines;
 
 #[derive(Debug, Clone)]

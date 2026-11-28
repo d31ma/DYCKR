@@ -1,5 +1,5 @@
-use crate::lua_types::LuaTypes;
 use crate::ascii_name::AsciiName;
+use crate::lua_types::LuaTypes;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LuaLine {

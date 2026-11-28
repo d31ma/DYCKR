@@ -1,8 +1,8 @@
 mod go_function_results;
 pub use go_function_results::GoFunctionResults;
 
-use crate::failure::Failure;
 use crate::ascii_name::AsciiName;
+use crate::failure::Failure;
 use crate::go_marker_name::GoMarkerName;
 use std::ops::Range;
 use std::path::Path;
@@ -43,7 +43,6 @@ pub fn validate_markers(path: &Path, source: &str, code: &str) -> Result<(), Fai
     Ok(())
 }
 
-
 fn marker_failure(path: &Path, source: &str, at: usize, message: impl Into<String>) -> Failure {
     Failure::one(crate::failure::diagnostic(
         1308,
@@ -54,7 +53,6 @@ fn marker_failure(path: &Path, source: &str, at: usize, message: impl Into<Strin
         crate::failure::source_span(&path.to_string_lossy(), at, (at + 1).min(source.len())),
     ))
 }
-
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GoTypeKind {

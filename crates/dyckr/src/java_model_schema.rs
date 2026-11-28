@@ -1,5 +1,5 @@
-use crate::piece::Piece;
 use crate::failure::Failure;
+use crate::piece::Piece;
 use std::path::Path;
 
 pub struct JavaModelSchema;

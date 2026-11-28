@@ -1,6 +1,6 @@
-use crate::hot_update::SourceChanges;
 use crate::failure::Failure;
 use crate::failure::diagnostic;
+use crate::hot_update::SourceChanges;
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher as _};
 use std::path::Path;
 use std::sync::Arc;

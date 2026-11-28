@@ -1,5 +1,5 @@
+use crate::failure::{Failure, diagnostic, source_span};
 use std::path::Path;
-use crate::failure::{diagnostic, source_span, Failure};
 
 pub struct Input<'a> {
     pub path: &'a Path,

@@ -1,11 +1,10 @@
+use crate::companion_failures::exposes_nothing;
+use crate::companion_member::Member;
+use crate::companion_member::rust_methods;
+use crate::companion_syntax::blocks;
+use crate::failure::Failure;
 use std::collections::HashMap;
 use std::fmt::Write as _;
-use crate::companion_member::Member;
-use crate::failure::Failure;
-use crate::companion_syntax::blocks;
-use crate::companion_member::rust_methods;
-use crate::companion_failures::exposes_nothing;
-
 
 pub fn rust_owner_table(
     source: &str,
@@ -15,12 +14,19 @@ pub fn rust_owner_table(
     needs_all: bool,
 ) -> Result<String, Failure> {
     let wanted = crate::declared_service::declared_service(source_path, source);
-    let Some((name, body)) = crate::companion_syntax::block_named(source, "struct", wanted.as_deref()) else {
-        return Err(crate::companion_failures::unnamed_service(source_path, wanted.as_deref(), "struct"));
+    let Some((name, body)) =
+        crate::companion_syntax::block_named(source, "struct", wanted.as_deref())
+    else {
+        return Err(crate::companion_failures::unnamed_service(
+            source_path,
+            wanted.as_deref(),
+            "struct",
+        ));
     };
     let mut members = crate::companion_member::rust_struct_fields(body);
 
-    let collaborators = crate::rust_collaborators::RustCollaborators::declared_beside(&name, source);
+    let collaborators =
+        crate::rust_collaborators::RustCollaborators::declared_beside(&name, source);
     members.retain(|member| !collaborators.holds(member.declared_type.as_deref()));
     let mut parameters = HashMap::new();
     for (header, impl_body) in blocks(source, "impl") {
@@ -32,7 +38,12 @@ pub fn rust_owner_table(
             members.push(member);
         }
     }
-    let instance = crate::rust_construction::RustConstruction::instance(source, source_path, &name, needs_all)?;
+    let instance = crate::rust_construction::RustConstruction::instance(
+        source,
+        source_path,
+        &name,
+        needs_all,
+    )?;
     let mut output = format!(
         "pub fn tac_create() -> Vec<(&'static str, TacMember)> {{\nlet instance = std::rc::Rc::new(core::cell::RefCell::new({instance}));\nvec![\n(\"__tachyon_busy\", TacMember::Busy({{let it = instance.clone(); Box::new(move || it.try_borrow_mut().is_err())}})),\n"
     );
@@ -58,10 +69,18 @@ pub fn write_rust_members(
             continue;
         }
         let returns = member.declared_type.as_deref();
-        if [member.asynchronous, crate::rust_task_member::RustTaskMember::fallible(returns)].contains(&true) {
+        if [
+            member.asynchronous,
+            crate::rust_task_member::RustTaskMember::fallible(returns),
+        ]
+        .contains(&true)
+        {
             let declared = parameters.get(&member.name).map_or(&[][..], Vec::as_slice);
             let entry = crate::rust_task_member::RustTaskMember::entry(
-                (&crate::companion_names::camel_case(&member.name), &member.name),
+                (
+                    &crate::companion_names::camel_case(&member.name),
+                    &member.name,
+                ),
                 returns,
                 declared,
                 member.asynchronous,
@@ -81,7 +100,8 @@ pub fn write_rust_method(output: &mut String, member: &Member, parameters: &[Str
     let key = crate::companion_names::camel_case(name);
     let kind = member.declared_type.as_deref().unwrap_or("()");
     let (bindings, passed) = crate::rust_arguments::rust_arguments(parameters);
-    let value = crate::rust_model_type::rust_read(kind, &format!("it.borrow_mut().{name}({passed})"));
+    let value =
+        crate::rust_model_type::rust_read(kind, &format!("it.borrow_mut().{name}({passed})"));
     let _ = writeln!(
         output,
         "(\"{key}\", TacMember::Method({{let it = instance.clone(); Box::new(move |arguments: Vec<TacValue>| {{ #[allow(unused_mut, unused_variables)] let mut arguments = arguments.into_iter(); {bindings}{value} }})}})),"
