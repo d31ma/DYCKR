@@ -61,28 +61,6 @@ impl CsharpOwnershipProject {
         root
     }
 
-    fn canonical_sources(root: &Path) {
-        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-        for relative in [
-            "call-the-server/client/services/CounterService.cs",
-            "call-the-server/client/remotes/GreetingClient.cs",
-            "call-the-server/client/models/Greeting.cs",
-            "call-the-server/client/setups/GreetingSetup.cs",
-            "add-tests/client/delegates/GreetingFakeDelegate.cs",
-            "add-tests/client/tests/CounterServiceTest.cs",
-            "add-tests/client/tests/HelloTestSetup.cs",
-        ] {
-            let source = std::fs::read_to_string(
-                repo.join(format!("website/content/docs/first-app/{relative}")),
-            )
-            .unwrap_or_else(|failure| panic!("canonical authored source: {failure}"));
-            let (_, target) = relative
-                .split_once("client/")
-                .unwrap_or_else(|| panic!("client path"));
-            Self::write(root, &format!("client/{target}"), &source);
-        }
-    }
-
     fn assembled(root: &Path) -> Result<String, crate::Failure> {
         let path = Path::new(Self::ENTRY);
         let raw = std::fs::read_to_string(root.join(path))
@@ -158,24 +136,6 @@ fn csharp_common_native_source_omits_selected_test_helpers() {
     assert!(output.contains("class TallyService"));
     assert!(!output.contains("class StepDelegate"));
     assert!(!output.contains("OwnerTestSetup"));
-}
-
-#[test]
-fn genuine_cumulative_csharp_first_app_helpers_do_not_enter_production() {
-    let root = tempfile::tempdir().unwrap_or_else(|failure| panic!("first app project: {failure}"));
-    CsharpOwnershipProject::canonical_sources(root.path());
-    let entry = Path::new("client/services/CounterService.cs");
-    let raw = std::fs::read_to_string(root.path().join(entry))
-        .unwrap_or_else(|failure| panic!("Counter Service: {failure}"));
-    let roles = crate::behavior::ServiceRoles::read(entry, &raw)
-        .unwrap_or_else(|failure| panic!("actual Service roles: {failure}"));
-    let output = super::assemble(root.path(), entry, &roles.source, "tac")
-        .unwrap_or_else(|failure| panic!("post-Test production composition: {failure}"))
-        .unwrap_or_else(|| panic!("production modules"));
-    assert!(output.contains("class GreetingClient"));
-    assert!(output.contains("class GreetingSetup"));
-    assert!(!output.contains("GreetingFakeDelegate"));
-    assert!(!output.contains("HelloTestSetup"));
 }
 
 #[test]

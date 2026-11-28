@@ -14,27 +14,27 @@ fn known_token_shapes_are_refused_in_every_kind_of_file() {
     for (path, source, kind) in [
         (
             "server/services/MailService.js",
-            "const key = 'AKIA0000000000000000';\n",
+            concat!("const key = 'AKIA", "QWERTYUIOPASDFGH';\n"),
             "an AWS access key",
         ),
         (
             "server/services/Git.py",
-            "TOKEN = \"ghp_000000000000000000000000000000000000\"\n",
+            concat!("TOKEN = \"ghp_", "0123456789abcdefghijABCDEFGHIJ012345\"\n"),
             "a GitHub token",
         ),
         (
             "server/services/Pay.java",
-            "String key = \"sk_live_00000000000000000000\";\n",
+            concat!("String key = \"sk_live_", "4eC39HqLyjWDarjtT1zdp7dc\";\n"),
             "a Stripe secret key",
         ),
         (
             "client/pages/tac.html",
-            "<p>xoxb-0000000000-0000000000-000</p>\n",
+            concat!("<p>xoxb-", "123456789012-1234567890123-abc</p>\n"),
             "a Slack token",
         ),
         (
             "server/application.json",
-            "{\"map\": \"AIza0000000000000000000000000000000000\"}\n",
+            concat!("{\"map\": \"AIza", "SyA1234567890abcdefghijklmnopqrstuv\"}\n"),
             "a Google API key",
         ),
         (

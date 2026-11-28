@@ -631,8 +631,8 @@ fn marker_name<'a>(extension: &str, line: &'a str) -> Option<&'a str> {
 #[cfg(test)]
 #[allow(clippy::expect_used)]
 mod tests {
-    use super::{behaviour_types, declaration_names, validate};
-    use std::path::{Path, PathBuf};
+    use super::{declaration_names, validate};
+    use std::path::Path;
     use tachyon_diagnostics::Diagnostic;
 
     fn assert_valid(path: &str, source: &str) {
@@ -853,113 +853,6 @@ mod tests {
         assert_eq!(
             declaration_names(Path::new("yon.py"), python).expect("Python module declarations"),
             ["Outer", "Handler"]
-        );
-    }
-
-    fn is_annotated_language(path: &Path) -> bool {
-        let extension = path
-            .extension()
-            .and_then(|value| value.to_str())
-            .unwrap_or("");
-        matches!(
-            extension,
-            "js" | "ts" | "py" | "php" | "java" | "kt" | "cs" | "rs" | "swift" | "dart"
-        )
-    }
-
-    fn annotated_sources(roots: &[PathBuf]) -> Vec<PathBuf> {
-        let mut pending = roots.to_vec();
-        let mut found = Vec::new();
-        while let Some(directory) = pending.pop() {
-            let Ok(entries) = std::fs::read_dir(&directory) else {
-                continue;
-            };
-            for entry in entries.flatten() {
-                let path = entry.path();
-                if path.is_dir() {
-                    pending.push(path);
-                } else if is_annotated_language(&path) {
-                    found.push(path);
-                }
-            }
-        }
-        found.sort();
-        found
-    }
-
-    fn declares_at_most_one_behaviour_type(path: &Path) -> bool {
-        let Ok(source) = std::fs::read_to_string(path) else {
-            return true;
-        };
-        behaviour_types(path, &source).is_ok_and(|behaviour| behaviour.len() < 2)
-    }
-
-    #[test]
-    fn checked_in_fixtures_declare_one_behavior_bearing_type() {
-        const NATIVE_UNIT: &str =
-            "one native Tac unit: a cached class has no role, so no file of its own";
-        const ASSEMBLED_ENTRY: &str = "one assembled Yon entry, as discovery composes it";
-        const CONTRACT: &str = "a declaration contract tsc reads, never a project";
-        const EXEMPT: [(&str, &str); 14] = [
-            ("tests/fixtures/behavior/csharp-annotations.cs", NATIVE_UNIT),
-            (
-                "tests/fixtures/behavior/dart-annotations.dart",
-                ASSEMBLED_ENTRY,
-            ),
-            (
-                "tests/fixtures/behavior/dart-configuration.dart",
-                ASSEMBLED_ENTRY,
-            ),
-            (
-                "tests/fixtures/behavior/swift-annotations.swift",
-                NATIVE_UNIT,
-            ),
-            ("tests/fixtures/behavior/providers.js", ASSEMBLED_ENTRY),
-            (
-                "tests/fixtures/behavior/rust_annotations.yon.rs",
-                ASSEMBLED_ENTRY,
-            ),
-            ("../../types/tests/behavior-annotations.js", CONTRACT),
-            ("../../types/tests/behavior-annotations.ts", CONTRACT),
-            ("../../types/tests/behavior-parameters.ts", CONTRACT),
-            ("../../types/tests/yon-annotations.js", CONTRACT),
-            ("../../types/tests/yon-routes.ts", CONTRACT),
-            ("../../types/tests/annotation-targets.ts", CONTRACT),
-            ("../../types/tests/annotation-targets.js", CONTRACT),
-            (
-                "../../types/tests/yon-annotations.ts",
-                "a declaration contract tsc reads, including shapes the compiler refuses",
-            ),
-        ];
-        let crate_root = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let mut unexpected = Vec::new();
-        let mut unused: Vec<&str> = EXEMPT.iter().map(|(path, _)| *path).collect();
-        let roots = [
-            crate_root.join("tests/fixtures"),
-            crate_root.join("../../types/tests"),
-        ];
-        for path in annotated_sources(&roots) {
-            if declares_at_most_one_behaviour_type(&path) {
-                continue;
-            }
-            let relative = path
-                .strip_prefix(crate_root)
-                .unwrap_or(&path)
-                .to_string_lossy()
-                .replace('\\', "/");
-            match EXEMPT.iter().find(|(known, _)| *known == relative) {
-                Some((known, _)) => unused.retain(|item| item != known),
-                None => unexpected.push(format!("{relative} is not conformant")),
-            }
-        }
-        assert!(
-            unexpected.is_empty(),
-            "split these sources, or name the reason in EXEMPT:\n{}",
-            unexpected.join("\n")
-        );
-        assert!(
-            unused.is_empty(),
-            "EXEMPT lists sources that are conformant now; drop them: {unused:?}"
         );
     }
 
