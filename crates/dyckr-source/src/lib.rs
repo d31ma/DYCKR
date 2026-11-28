@@ -15,6 +15,7 @@ pub mod lua_source;
 pub mod method_coverage;
 pub mod model_layout;
 pub mod model_sources;
+pub mod old_topic_logs;
 pub mod project;
 pub mod route_schema;
 pub mod route_types;
