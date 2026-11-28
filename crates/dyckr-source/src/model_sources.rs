@@ -85,6 +85,7 @@ impl ModelSources {
         )
     }
 
+    #[must_use]
     pub fn used_by(&self, programs: [&str; 2]) -> Self {
         Self {
             extension: self.extension.clone(),

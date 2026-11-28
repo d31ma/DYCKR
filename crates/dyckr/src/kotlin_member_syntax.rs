@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-pub const SUSPEND: &'static str = "suspend ";
+pub const SUSPEND: &str = "suspend ";
 
     pub fn public_declaration(mut source: &str) -> Option<&str> {
         loop {

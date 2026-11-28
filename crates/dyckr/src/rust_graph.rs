@@ -1,5 +1,4 @@
 use crate::rust_held_fields::RustHeldFields;
-use crate::rust_collaborators::RustCollaborators;
 use crate::rust_construction::RustConstruction;
 use crate::companion_syntax::{block_named, blocks};
 use crate::declared_service::declared_service;

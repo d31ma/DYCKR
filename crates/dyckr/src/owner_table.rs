@@ -26,7 +26,7 @@ pub fn class_owner_table(
     source_path: &str,
     excluded: &[String],
     extra: &str,
-    needs_all: bool,
+    _needs_all: bool,
     constructed: &[(String, String)],
 ) -> Result<String, Failure> {
     let wanted = crate::declared_service::declared_service(source_path, source);

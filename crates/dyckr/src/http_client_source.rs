@@ -32,13 +32,13 @@ pub struct RequestEdit {
     pub marker: String,
     pub blanks: Vec<(Range<usize>, String)>,
 }
-pub const TAC: &'static str = "tac";
-pub const BROWSER_SCRIPTS: [&'static str; 2] = ["js", "ts"];
-pub const CLASS: &'static str = "httpclient";
-pub const STREAM: &'static str = "streamrequest";
-pub const SOCKET: &'static str = "socketrequest";
-pub const CACHE_OPTION_REFUSAL: &'static str = "@HTTPClient no longer takes \"cache\": its IndexedDB fetch cache was removed (ADR 0087). Mark the class @CacheSettings and each read method @Cached, like Spring's @Cacheable. For reads that work offline, add a rule for the path to tac.cache in client/manifest.json";
-pub const OTHER_ROLES: [&'static str; 9] = [
+pub const TAC: &str = "tac";
+pub const BROWSER_SCRIPTS: [&str; 2] = ["js", "ts"];
+pub const CLASS: &str = "httpclient";
+pub const STREAM: &str = "streamrequest";
+pub const SOCKET: &str = "socketrequest";
+pub const CACHE_OPTION_REFUSAL: &str = "@HTTPClient no longer takes \"cache\": its IndexedDB fetch cache was removed (ADR 0087). Mark the class @CacheSettings and each read method @Cached, like Spring's @Cacheable. For reads that work offline, add a rule for the path to tac.cache in client/manifest.json";
+pub const OTHER_ROLES: [&str; 9] = [
         "service",
         "store",
         "delegate",
@@ -51,16 +51,16 @@ pub const OTHER_ROLES: [&'static str; 9] = [
     ];
 
 
-pub const ROLE_SUFFIXES: [&'static str; 4] = ["Client", "Service", "Store", "Delegate"];
+pub const ROLE_SUFFIXES: [&str; 4] = ["Client", "Service", "Store", "Delegate"];
 
-pub const REQUESTS: [(&'static str, &'static str, &'static str); 5] = [
+pub const REQUESTS: [(&str, &str, &str); 5] = [
         ("getrequest", "GET", "GetRequest"),
         ("postrequest", "POST", "PostRequest"),
         ("putrequest", "PUT", "PutRequest"),
         ("patchrequest", "PATCH", "PatchRequest"),
         ("deleterequest", "DELETE", "DeleteRequest"),
     ];
-pub const PARAMETERS: [(&'static str, &'static str, &'static str); 4] = [
+pub const PARAMETERS: [(&str, &str, &str); 4] = [
         ("pathvariable", "pathVariables", "PathVariable"),
         ("requestparam", "query", "RequestParam"),
         ("requestbody", "body", "RequestBody"),

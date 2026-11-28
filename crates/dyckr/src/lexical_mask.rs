@@ -1,4 +1,3 @@
-use std::ops::Range;
 
 pub struct LexicalMask {
     pub code: Vec<bool>,

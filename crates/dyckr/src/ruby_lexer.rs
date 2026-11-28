@@ -1,5 +1,4 @@
 use crate::lexical_mask::LexicalMask;
-use crate::go_marker_name::GoMarkerName;
 
 pub struct RubyLexer<'a> {
     bytes: &'a [u8],

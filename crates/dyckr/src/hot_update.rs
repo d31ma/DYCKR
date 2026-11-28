@@ -193,10 +193,16 @@ impl SourceChanges {
     }
 }
 
+impl Default for SourceChanges {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::hot_update::{SourceAction, SourceChanges};
-    use crate::one_test_per_case;
+    
     use notify::{Event, EventKind};
     use std::path::Path;
 

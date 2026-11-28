@@ -1,4 +1,3 @@
-use crate::companion_language::CompanionLanguage;
 
 pub fn declares_table(language: crate::companion_language::CompanionLanguage, source: &str) -> bool {
     let prefixes: &[&str] = match language {

@@ -1,4 +1,4 @@
-pub const NAMES: [&'static str; 9] = [
+pub const NAMES: [&str; 9] = [
         "Settings",
         "Setting",
         "Checked",

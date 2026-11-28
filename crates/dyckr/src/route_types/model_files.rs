@@ -1,4 +1,4 @@
-use crate::route_types::{Model, ModelField, Record, Shape, TypeText};
+use crate::route_types::{Model, Record, Shape, TypeText};
 use crate::ascii_name::AsciiName;
 use std::ops::Range;
 use std::path::{Path, PathBuf};

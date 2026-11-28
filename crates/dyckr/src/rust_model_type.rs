@@ -57,6 +57,32 @@ impl RustModelType {
     }
 }
 
+pub fn rust_read(kind: &str, expression: &str) -> String {
+    match kind {
+        "TacValue" => format!("({expression})"),
+        "f32" | "f64" => format!("TacValue::Float(f64::from({expression}))"),
+        "bool" => format!("TacValue::Flag({expression})"),
+        "String" | "&str" => format!("TacValue::Text(({expression}).to_string())"),
+        "()" => format!("{{ {expression}; TacValue::Null }}"),
+        _ if RustModelType::is_model(kind) => RustModelType::read(expression),
+        _ => format!("TacValue::Int(({expression}) as i64)"),
+    }
+}
+
+pub fn rust_write(kind: &str) -> Option<String> {
+    let conversion = match kind {
+        "TacValue" => String::from("value"),
+        "f32" => String::from("value.as_float() as f32"),
+        "f64" => String::from("value.as_float()"),
+        "bool" => String::from("value.as_flag()"),
+        "String" => String::from("value.as_text()"),
+        "&str" => return None,
+        _ if RustModelType::is_model(kind) => RustModelType::write(kind),
+        _ => format!("value.as_int() as {kind}"),
+    };
+    Some(conversion)
+}
+
 #[cfg(test)]
 mod tests {
     use super::RustModelType;
@@ -125,30 +151,4 @@ mod tests {
             "<Vec<Product> as TacModel>::read(&value)"
         );
     }
-}
-
-pub fn rust_read(kind: &str, expression: &str) -> String {
-    match kind {
-        "TacValue" => format!("({expression})"),
-        "f32" | "f64" => format!("TacValue::Float(f64::from({expression}))"),
-        "bool" => format!("TacValue::Flag({expression})"),
-        "String" | "&str" => format!("TacValue::Text(({expression}).to_string())"),
-        "()" => format!("{{ {expression}; TacValue::Null }}"),
-        _ if RustModelType::is_model(kind) => RustModelType::read(expression),
-        _ => format!("TacValue::Int(({expression}) as i64)"),
-    }
-}
-
-pub fn rust_write(kind: &str) -> Option<String> {
-    let conversion = match kind {
-        "TacValue" => String::from("value"),
-        "f32" => String::from("value.as_float() as f32"),
-        "f64" => String::from("value.as_float()"),
-        "bool" => String::from("value.as_flag()"),
-        "String" => String::from("value.as_text()"),
-        "&str" => return None,
-        _ if RustModelType::is_model(kind) => RustModelType::write(kind),
-        _ => format!("value.as_int() as {kind}"),
-    };
-    Some(conversion)
 }

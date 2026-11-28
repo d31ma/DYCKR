@@ -1,4 +1,3 @@
-use crate::ascii_name::AsciiName;
 
 pub struct GoMarkerName;
 

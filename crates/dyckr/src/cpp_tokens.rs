@@ -18,6 +18,10 @@ impl CppTokens {
         self.list.len()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.list.is_empty()
+    }
+
     pub fn is(&self, index: usize, text: &str) -> bool {
         self.list.get(index).is_some_and(|token| token.is(text))
     }
@@ -41,7 +45,7 @@ impl CppTokens {
     pub fn skipped(&self, index: usize) -> usize {
         self.partner(index)
             .filter(|partner| *partner > index)
-            .map_or(index, |partner| partner)
+            .unwrap_or(index)
             + 1
     }
 

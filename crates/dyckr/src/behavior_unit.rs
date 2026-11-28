@@ -1,5 +1,4 @@
 use serde_json::{Map, Value};
-use crate::sorted_json::SortedJson;
 
 pub struct Unit {
     pub name: String,

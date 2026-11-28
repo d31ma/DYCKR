@@ -205,7 +205,7 @@ impl crate::detached_csharp::DetachedCsharp {
 }
 
 impl crate::detached_csharp::DetachedCsharp {
-    pub fn of_with(module: &Module, lower: &dyn Fn(&Module) -> Result<String, String>, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> Result<Self, String> {
+    pub fn of_with(module: &Module, lower: &dyn Fn(&Module) -> Result<String, String>, runtime: &crate::csharp::RuntimeWriter) -> Result<Self, String> {
         let lowered = lower(module)?;
         Ok(Self {
             lowered,
@@ -217,7 +217,7 @@ impl crate::detached_csharp::DetachedCsharp {
         })
     }
 
-    pub fn page_socket_runtime_with(path: &std::path::Path, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> String {
+    pub fn page_socket_runtime_with(path: &std::path::Path, runtime: &crate::csharp::RuntimeWriter) -> String {
         let module_id = crate::module_id::module_id(path);
         crate::detached_csharp::configured(&runtime(
             &module_id,
@@ -229,7 +229,7 @@ impl crate::detached_csharp::DetachedCsharp {
         ))
     }
 
-    pub fn runtime_with(module: &Module, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String) -> String {
+    pub fn runtime_with(module: &Module, runtime: &crate::csharp::RuntimeWriter) -> String {
         crate::detached_csharp::configured(&runtime(
             &module.module_id,
             &module.environment,

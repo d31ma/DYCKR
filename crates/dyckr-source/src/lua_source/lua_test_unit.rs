@@ -22,6 +22,7 @@ impl<'u> LuaTestUnit<'u> {
         }
     }
 
+    #[must_use]
     pub fn with_behaviors(self, behaviors: bool) -> Self {
         Self { behaviors, ..self }
     }

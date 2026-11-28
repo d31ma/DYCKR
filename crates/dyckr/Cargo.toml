@@ -6,6 +6,9 @@ rust-version = "1.97.1"
 authors = ["Tachyon Contributors"]
 license = "MIT"
 
+[features]
+json-preserve-order = ["serde_json/preserve_order"]
+
 [dependencies]
 tachyon-diagnostics = { path = "../tachyon-diagnostics" }
 tachyon-contracts = { path = "../tachyon-contracts" }

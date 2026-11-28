@@ -19,7 +19,7 @@ impl ProviderQualifiers {
             .unwrap_or_else(|| json!({}))
     }
 
-    pub fn read_source(path: &Path, source: &str, class: &str, prepare: &dyn Fn(&Path, &str, &str) -> Result<Option<Prepared>, Failure>) -> Result<Value, Failure> {
+    pub fn read_source(path: &Path, source: &str, class: &str, prepare: &crate::model_schema::Prepare) -> Result<Value, Failure> {
         let prepared = prepare(path, source, "tac")?;
         Ok(Self::read(prepared.as_ref(), class))
     }

@@ -1,4 +1,3 @@
-use crate::csharp_task_shape::CsharpTaskShape;
 use crate::csharp_task_answer::CsharpTaskAnswer;
 use crate::route_types::ModelTable;
 

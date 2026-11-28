@@ -1,7 +1,7 @@
 use std::ops::Range;
 
-pub const OPEN: &'static str = "[<";
-pub const CLOSE: &'static str = ">]";
+pub const OPEN: &str = "[<";
+pub const CLOSE: &str = ">]";
 
 pub fn is_tachyon_name(item: &str) -> &str {
     item.split(['(', ' ']).next().unwrap_or(item)

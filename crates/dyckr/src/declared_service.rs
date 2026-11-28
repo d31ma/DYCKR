@@ -1,4 +1,3 @@
-use std::path::Path;
 
 
 pub fn declared_service(source_path: &str, source: &str) -> Option<String> {

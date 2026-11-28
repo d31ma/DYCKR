@@ -1,4 +1,3 @@
-use crate::csharp_task_members::CsharpTaskMembers;
 use crate::companion_member::{Member, csharp_arguments, csharp_parameters, without_type_first_modifiers};
 use crate::lower_first::lower_first;
 use crate::unicode_name::UnicodeName;

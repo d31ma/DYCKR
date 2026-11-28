@@ -73,7 +73,7 @@ pub fn test_context(unit: &Unit) -> String {
 pub fn case_names(calls: &[(String, String)]) -> String {
     let mut names = Vec::new();
     for (name, _) in calls {
-        names.push(crate::csharp::quote(&name));
+        names.push(crate::csharp::quote(name));
     }
     names.join(", ")
 }
@@ -450,7 +450,7 @@ pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) 
             "System.Text.Json.Nodes.JsonNode.Parse(report.ToString())",
         )
     };
-    let names = crate::csharp::case_names(&calls);
+    let names = crate::csharp::case_names(calls);
     let dispatch = crate::csharp::joined(calls.iter().cloned(), |(name, call)| {
         format!("case {}: RunCaseBody(() => {call}); return;", crate::csharp::quote(&name))
     });
@@ -484,7 +484,12 @@ pub fn test_members(unit: &Unit, environment: &str, calls: &[(String, String)]) 
 }
 
 
-pub fn lower(module: &Module, runtime: &dyn Fn(&str, &str, &str, &str, &str, &str) -> String, test_block: &dyn Fn(&Module, &Type, &Unit) -> String, unit_helper: &dyn Fn(&Module) -> &'static str, exchange_body: &dyn Fn(&Type, &Method, &str) -> Option<String>) -> Result<String, String> {
+pub type RuntimeWriter = dyn Fn(&str, &str, &str, &str, &str, &str) -> String;
+pub type TestBlockWriter = dyn Fn(&Module, &Type, &Unit) -> String;
+pub type UnitHelper = dyn Fn(&Module) -> &'static str;
+pub type ExchangeBody = dyn Fn(&Type, &Method, &str) -> Option<String>;
+
+pub fn lower(module: &Module, runtime: &RuntimeWriter, test_block: &TestBlockWriter, unit_helper: &UnitHelper, exchange_body: &ExchangeBody) -> Result<String, String> {
     let mut edits = Vec::new();
     let mut registrations = Map::new();
     let mut configurations = String::new();

@@ -1,6 +1,5 @@
 use crate::failure::{diagnostic, Failure};
 use serde::Serialize;
-use std::fmt::Write as _;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct NativeRouteIndexEntry {

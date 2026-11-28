@@ -73,6 +73,7 @@ impl Expression {
         self.node.client_json()
     }
 
+    #[must_use]
     pub fn equals(&self, other: &Self) -> Self {
         Self {
             source: format!("{} == {}", self.source, other.source),

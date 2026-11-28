@@ -95,6 +95,7 @@ pub struct RubyMembers {
 impl RubyMembers {
     const HIDING_SECTIONS: [&'static str; 2] = ["private", "protected"];
 
+    #[must_use]
     pub fn without_needed(mut self, source: &str) -> Self {
         let needed = RubyNeeds::fields(source);
         self.fields.retain(|field| !needed.contains(field));

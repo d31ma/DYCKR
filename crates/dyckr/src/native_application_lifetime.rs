@@ -1,4 +1,4 @@
-use crate::failure::{diagnostic, source_span, Failure};
+use crate::failure::Failure;
 use std::path::Path;
 use tachyon_contracts::NativeTarget;
 

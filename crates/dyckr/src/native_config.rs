@@ -3,7 +3,6 @@ use crate::valid_route::valid_route;
 use crate::config_failure::config_failure;
 use crate::native_site::{RawCacheRule, SiteMetadata, SitemapValues};
 use crate::failure::Failure;
-use crate::failure::{diagnostic, source_span};
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::fs;

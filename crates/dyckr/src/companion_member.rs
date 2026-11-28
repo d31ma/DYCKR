@@ -1,22 +1,11 @@
-use std::collections::BTreeSet;
-use std::path::Path;
-use crate::failure::{diagnostic, source_span, Failure};
+use crate::failure::Failure;
 use crate::unicode_name::UnicodeName;
 use crate::companion_language::CompanionLanguage;
 use crate::modifiers::Modifiers;
-use crate::declares_table::declares_table;
 use crate::companion_syntax::*;
-use crate::companion_failures::{authored_table, exposes_nothing, missing_constructor, missing_type, unnamed_service};
-use crate::companion_names::camel_case;
-use crate::declared_service::declared_service;
-use crate::rust_collaborators::RustCollaborators;
-use crate::rust_model_type::{RustModelType, rust_read, rust_write};
-use crate::rust_task_member::RustTaskMember;
-use crate::rust_arguments::rust_arguments;
-use crate::csharp_model_type::CsharpModelType;
-use crate::companion_converters::{csharp_converter, kotlin_constructor, kotlin_value, swift_constructor};
-use crate::kotlin_member_syntax::{public_declaration, suspended};
-use crate::web_api_clients::WebApiClients;
+use crate::companion_failures::missing_type;
+use crate::rust_model_type::RustModelType;
+use crate::companion_converters::kotlin_value;
 use crate::lower_first::lower_first;
 
 pub struct Member {

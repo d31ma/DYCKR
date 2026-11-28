@@ -1,6 +1,5 @@
 use std::path::Path;
 use crate::failure::Failure;
-use crate::source_mask::masked_source;
 
 
 pub fn declaration_names_source(path: &Path, source: &str) -> Result<Vec<String>, Failure> {

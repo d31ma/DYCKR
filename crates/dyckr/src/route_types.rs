@@ -1,5 +1,4 @@
 use crate::plan::{ParameterSource, Route};
-use serde::Serialize;
 pub use crate::shape::Shape;
 pub use crate::model::{Model, ModelField, Record};
 use serde_json::{Map, Value, json};

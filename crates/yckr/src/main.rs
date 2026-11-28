@@ -139,12 +139,7 @@ fn home_cache() -> PathBuf {
 }
 
 fn platform_target() -> String {
-    let os = match env::consts::OS {
-        "macos" => "macos",
-        "linux" => "linux",
-        "windows" => "windows",
-        other => other,
-    };
+    let os = env::consts::OS;
     let arch = match env::consts::ARCH {
         "aarch64" => "arm64",
         "x86_64" => "x86_64",

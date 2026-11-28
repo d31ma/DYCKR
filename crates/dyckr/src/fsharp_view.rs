@@ -148,7 +148,7 @@ impl FsharpView {
         FsharpView::with_fsharp_attributes(renamed)
     }
 
-    pub fn with_fsharp_attributes(mut text: String) -> String {
+    pub fn with_fsharp_attributes(text: String) -> String {
         let rules: Vec<&'static str> = crate::annotation_rule::AnnotationRules::rules().map(|rule| rule.name).collect();
         crate::fsharp_view::with_fsharp_attributes(text, &rules)
     }

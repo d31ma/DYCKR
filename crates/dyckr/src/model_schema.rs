@@ -1,7 +1,7 @@
-pub const CLIENT_LANGUAGES: [&'static str; 13] = [
+pub const CLIENT_LANGUAGES: [&str; 13] = [
         "java", "js", "ts", "py", "cs", "fs", "rs", "swift", "kt", "go", "dart", "rb", "lua",
     ];
-pub const CLIENT_MODELS: &'static str = "client/models";
+pub const CLIENT_MODELS: &str = "client/models";
 use crate::failure::Failure;
 use crate::behavior_input::Input;
 
@@ -71,6 +71,12 @@ use std::path::Path;
             None => Err("Model schema metadata was not consumed".to_owned()),
         }
     }
+pub type Prepare = dyn Fn(&std::path::Path, &str, &str) -> Result<Option<crate::prepared::Prepared>, crate::failure::Failure>;
+pub type Annotations = dyn Fn(&crate::behavior_input::Input<'_>, &str, &str) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>;
+pub type Markers = dyn Fn(&crate::behavior_input::Input<'_>) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>;
+pub type Lower = dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>;
+pub type NativePlain = dyn Fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>;
+
 pub struct ModelSchema;
 
 impl ModelSchema {
@@ -79,8 +85,8 @@ impl ModelSchema {
         input: &crate::behavior_input::Input<'_>,
         language: &str,
         environment: &str,
-        annotations: &dyn Fn(&crate::behavior_input::Input<'_>, &str, &str) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>,
-        prepare: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<crate::prepared::Prepared>, crate::failure::Failure>,
+        annotations: &Annotations,
+        prepare: &Prepare,
     ) -> Result<String, crate::failure::Failure> {
         let markers = annotations(input, language, environment)?;
         Self::project(input, &markers, environment, prepare)
@@ -90,7 +96,7 @@ impl ModelSchema {
         input: &crate::behavior_input::Input<'_>,
         markers: &[crate::behavior_marker::Marker],
         environment: &str,
-        prepare: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<crate::prepared::Prepared>, crate::failure::Failure>,
+        prepare: &Prepare,
     ) -> Result<String, crate::failure::Failure> {
         crate::model_schema::require_schema(input, markers)?;
         let prepared = prepare(input.path, input.source, environment)?;
@@ -98,7 +104,7 @@ impl ModelSchema {
     }
 
 
-    pub fn script_marked(input: &crate::behavior_input::Input<'_>, markers_fn: &dyn Fn(&crate::behavior_input::Input<'_>) -> Result<Vec<crate::behavior_marker::Marker>, crate::failure::Failure>, lower_fn: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<Option<String>, Failure> {
+    pub fn script_marked(input: &crate::behavior_input::Input<'_>, markers_fn: &Markers, lower_fn: &Lower) -> Result<Option<String>, Failure> {
         let markers = markers_fn(input)?;
         let schema = markers
             .iter()
@@ -108,7 +114,7 @@ impl ModelSchema {
             .transpose()
     }
 
-    pub fn script_projection(input: &crate::behavior_input::Input<'_>, markers: &[crate::behavior_marker::Marker], lower_fn: &dyn Fn(&std::path::Path, &str, &str) -> Result<Option<String>, crate::failure::Failure>) -> Result<String, crate::failure::Failure> {
+    pub fn script_projection(input: &crate::behavior_input::Input<'_>, markers: &[crate::behavior_marker::Marker], lower_fn: &Lower) -> Result<String, crate::failure::Failure> {
         crate::model_schema::require_schema(input, markers)?;
         let environment = ["yon", "tac"][usize::from(input.path.starts_with("client"))];
         lower_fn(input.path, input.source, environment)?;
@@ -153,7 +159,7 @@ impl ModelSchema {
     pub fn lua_plain(
         view: &crate::lua_view::LuaView,
         source: &str,
-        native_plain: &dyn Fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>,
+        native_plain: &NativePlain,
     ) -> Result<Option<String>, crate::failure::Failure> {
         let plain =
             native_plain(view.path(), view.text()).map_err(|error| view.failure(&error))?;
@@ -163,7 +169,7 @@ impl ModelSchema {
     pub fn fsharp_plain(
         view: &crate::fsharp_view::FsharpView,
         source: &str,
-        native_plain: &dyn Fn(&std::path::Path, &str) -> Result<Option<String>, crate::failure::Failure>,
+        native_plain: &NativePlain,
     ) -> Result<Option<String>, crate::failure::Failure> {
         let plain =
             native_plain(view.path(), view.text()).map_err(|error| view.failure(&error))?;
