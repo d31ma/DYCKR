@@ -16,6 +16,7 @@ pub mod method_coverage;
 pub mod model_layout;
 pub mod model_sources;
 pub mod project;
+pub mod route_schema;
 pub mod route_types;
 pub mod ruby_source;
 pub mod schedule;
